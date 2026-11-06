@@ -83,7 +83,7 @@ function ensureDriverTutorialAssets() {
                 background: rgba(0,0,0,0.12) !important;
             }
             .custom-driver-popover .driver-popover-close-btn::after {
-                content: 'Skip';
+                content: 'Omitir';
                 font-size: 0.8rem;
                 font-weight: 600;
                 color: rgba(0,0,0,0.45);
@@ -213,7 +213,7 @@ export async function initElementTutorial(force = false) {
                     background: rgba(0,0,0,0.12) !important;
                 }
                 .custom-driver-popover .driver-popover-close-btn::after {
-                    content: 'Skip';
+                    content: 'Omitir';
                     font-size: 0.8rem;
                     font-weight: 600;
                     color: rgba(0,0,0,0.45);
@@ -291,7 +291,7 @@ export async function initBalancerTutorial(force = false) {
                     overflow: hidden !important;
                 }
                 .custom-driver-popover .driver-popover-close-btn:hover { background: rgba(0,0,0,0.12) !important; }
-                .custom-driver-popover .driver-popover-close-btn::after { content: 'Skip'; font-size: 0.8rem; font-weight: 600; color: rgba(0,0,0,0.45); }
+                .custom-driver-popover .driver-popover-close-btn::after { content: 'Omitir'; font-size: 0.8rem; font-weight: 600; color: rgba(0,0,0,0.45); }
                 .custom-driver-popover .driver-popover-close-btn:hover::after { color: rgba(0,0,0,0.7); }
                 .custom-driver-popover .driver-popover-title { padding-right: 60px !important; }
                 .driver-popover-arrow.driver-popover-arrow-side-top, .driver-popover-arrow.driver-popover-arrow-side-bottom { left: calc(50% - 5px) !important; right: auto !important; }
@@ -439,6 +439,7 @@ function startTutorial(driver, tutorialKey, delayMs = 1200) {
             prevBtnText: t("tutorial.previous"),
             nextBtnText: t("tutorial.next"),
             doneBtnText: t("tutorial.done"),
+            progressText: "{{current}} de {{total}}",
             overlayColor: 'rgba(0, 0, 0, 0.65)',
             popoverClass: 'custom-driver-popover',
             stagePadding: 6,
@@ -538,6 +539,7 @@ function startBalancerTour(driver, tutorialKey, delayMs = 800) {
             prevBtnText: t("tutorial.previous") || "Previous",
             nextBtnText: t("tutorial.next") || "Next",
             doneBtnText: t("tutorial.done") || "Done",
+            progressText: "{{current}} de {{total}}",
             overlayColor: 'rgba(0, 0, 0, 0.65)',
             popoverClass: 'custom-driver-popover',
             stagePadding: 8,
@@ -670,6 +672,7 @@ function startPredictorTour(driver, tutorialKey, delayMs = 800) {
             prevBtnText: t("tutorial.previous") || "Previous",
             nextBtnText: t("tutorial.next") || "Next",
             doneBtnText: t("tutorial.done") || "Done",
+            progressText: "{{current}} de {{total}}",
             overlayColor: 'rgba(0, 0, 0, 0.65)',
             popoverClass: 'custom-driver-popover',
             stagePadding: 8,
@@ -795,6 +798,7 @@ function startMolarMassTour(driver, tutorialKey, delayMs = 800) {
             prevBtnText: t("tutorial.previous") || "Previous",
             nextBtnText: t("tutorial.next") || "Next",
             doneBtnText: t("tutorial.done") || "Done",
+            progressText: "{{current}} de {{total}}",
             overlayColor: 'rgba(0, 0, 0, 0.65)',
             popoverClass: 'custom-driver-popover',
             stagePadding: 8,
@@ -913,6 +917,7 @@ function startSolubilityTour(driver, tutorialKey, delayMs = 800) {
             prevBtnText: t("tutorial.previous") || "Previous",
             nextBtnText: t("tutorial.next") || "Next",
             doneBtnText: t("tutorial.done") || "Done",
+            progressText: "{{current}} de {{total}}",
             overlayColor: 'rgba(0, 0, 0, 0.65)',
             popoverClass: 'custom-driver-popover',
             stagePadding: 8,
@@ -1041,6 +1046,7 @@ function startVirtualLabTour(driver, tutorialKey, delayMs = 800) {
             prevBtnText: t("tutorial.previous") || "Previous",
             nextBtnText: t("tutorial.next") || "Next",
             doneBtnText: t("tutorial.done") || "Done",
+            progressText: "{{current}} de {{total}}",
             overlayColor: 'rgba(0, 0, 0, 0.65)',
             popoverClass: 'custom-driver-popover',
             stagePadding: 8,

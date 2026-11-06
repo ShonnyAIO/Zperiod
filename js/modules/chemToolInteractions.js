@@ -3376,7 +3376,7 @@ function generateSolubilityToolContent() {
             }
         </style>
 
-        <div class="tool-padding-label">Solubility Table</div>
+        <div class="tool-padding-label">Tabla de solubilidad</div>
         <div class="sol-calc-wrapper">
 
             <!-- Two Column Grid -->
@@ -3384,10 +3384,10 @@ function generateSolubilityToolContent() {
                 <!-- Left: Input Controls -->
                 <div class="sol-controls">
                     <div class="sol-glass-card">
-                        <div class="sol-section-label">Enter Chemical Formula</div>
+                        <div class="sol-section-label">Escribe la fórmula química</div>
                         <div class="sol-input-stack">
                             <input type="text" id="solubility-input" class="sol-input-field" placeholder="${t("solubility.inputPlaceholder")}" autocomplete="off">
-                            <button id="check-solubility-btn" class="sol-check-btn">Check Solubility</button>
+                            <button id="check-solubility-btn" class="sol-check-btn">Verificar solubilidad</button>
                         </div>
                     </div>
 
@@ -3402,44 +3402,44 @@ function generateSolubilityToolContent() {
                     <table class="sol-glass-table">
                         <tbody>
                             <tr>
-                                <td><span class="sol-anion-name"><span class="sol-ion"><span class="sol-ion-base">NO</span><span class="sol-ion-scripts"><span class="sup">−</span><span class="sub">3</span></span></span></span><span class="sol-anion-label">Nitrate</span></td>
+                                <td><span class="sol-anion-name"><span class="sol-ion"><span class="sol-ion-base">NO</span><span class="sol-ion-scripts"><span class="sup">−</span><span class="sub">3</span></span></span></span><span class="sol-anion-label">Nitrato</span></td>
                                 <td><span class="sol-pill sol-pill-soluble">Soluble</span></td>
-                                <td class="sol-exception-text">None — always soluble</td>
+                                <td class="sol-exception-text">Ninguna: siempre soluble</td>
                             </tr>
                             <tr>
-                                <td><span class="sol-anion-name">CH<sub>3</sub>COO<sup class="sol-sup-high">−</sup></span><span class="sol-anion-label">Acetate</span></td>
+                                <td><span class="sol-anion-name">CH<sub>3</sub>COO<sup class="sol-sup-high">−</sup></span><span class="sol-anion-label">Acetato</span></td>
                                 <td><span class="sol-pill sol-pill-soluble">Soluble</span></td>
-                                <td class="sol-exception-text">None — always soluble</td>
+                                <td class="sol-exception-text">Ninguna: siempre soluble</td>
                             </tr>
                             <tr>
-                                <td><span class="sol-anion-name">Cl<sup class="sol-sup-high">−</sup>, Br<sup class="sol-sup-high">−</sup>, I<sup class="sol-sup-high">−</sup></span><span class="sol-anion-label">Halides</span></td>
+                                <td><span class="sol-anion-name">Cl<sup class="sol-sup-high">−</sup>, Br<sup class="sol-sup-high">−</sup>, I<sup class="sol-sup-high">−</sup></span><span class="sol-anion-label">Haluros</span></td>
                                 <td><span class="sol-pill sol-pill-soluble">Soluble</span></td>
                                 <td class="sol-exception-text">Ag<sup>+</sup>, Pb<sup>2+</sup>, <span class="sol-ion"><span class="sol-ion-base">Hg</span><span class="sol-ion-scripts"><span class="sup">2+</span><span class="sub">2</span></span></span> <span class="sol-pill sol-pill-insoluble">Insol.</span></td>
                             </tr>
                             <tr>
-                                <td><span class="sol-anion-name"><span class="sol-ion"><span class="sol-ion-base">SO</span><span class="sol-ion-scripts"><span class="sup">2−</span><span class="sub">4</span></span></span></span><span class="sol-anion-label">Sulfate</span></td>
+                                <td><span class="sol-anion-name"><span class="sol-ion"><span class="sol-ion-base">SO</span><span class="sol-ion-scripts"><span class="sup">2−</span><span class="sub">4</span></span></span></span><span class="sol-anion-label">Sulfato</span></td>
                                 <td><span class="sol-pill sol-pill-soluble">Soluble</span></td>
                                 <td class="sol-exception-text">Ba<sup>2+</sup>, Pb<sup>2+</sup>, Ca<sup>2+</sup>, Sr<sup>2+</sup> <span class="sol-pill sol-pill-insoluble">Insol.</span></td>
                             </tr>
                             <tr>
-                                <td><span class="sol-anion-name">OH<sup class="sol-sup-high">−</sup></span><span class="sol-anion-label">Hydroxide</span></td>
+                                <td><span class="sol-anion-name">OH<sup class="sol-sup-high">−</sup></span><span class="sol-anion-label">Hidróxido</span></td>
                                 <td><span class="sol-pill sol-pill-insoluble">Insol.</span></td>
-                                <td class="sol-exception-text">Group 1, <span class="sol-ion"><span class="sol-ion-base">NH</span><span class="sol-ion-scripts"><span class="sup">+</span><span class="sub">4</span></span></span> <span class="sol-pill sol-pill-soluble">Sol.</span> Ca<sup>2+</sup>, Ba<sup>2+</sup>, Sr<sup>2+</sup> slightly</td>
+                                <td class="sol-exception-text">Grupo 1, <span class="sol-ion"><span class="sol-ion-base">NH</span><span class="sol-ion-scripts"><span class="sup">+</span><span class="sub">4</span></span></span> <span class="sol-pill sol-pill-soluble">Sol.</span> Ca<sup>2+</sup>, Ba<sup>2+</sup>, Sr<sup>2+</sup> poco solubles</td>
                             </tr>
                             <tr>
-                                <td><span class="sol-anion-name"><span class="sol-ion"><span class="sol-ion-base">CO</span><span class="sol-ion-scripts"><span class="sup">2−</span><span class="sub">3</span></span></span></span><span class="sol-anion-label">Carbonate</span></td>
+                                <td><span class="sol-anion-name"><span class="sol-ion"><span class="sol-ion-base">CO</span><span class="sol-ion-scripts"><span class="sup">2−</span><span class="sub">3</span></span></span></span><span class="sol-anion-label">Carbonato</span></td>
                                 <td><span class="sol-pill sol-pill-insoluble">Insol.</span></td>
-                                <td class="sol-exception-text">Group 1, <span class="sol-ion"><span class="sol-ion-base">NH</span><span class="sol-ion-scripts"><span class="sup">+</sup><span class="sub">4</span></span></span> <span class="sol-pill sol-pill-soluble">Soluble</span></td>
+                                <td class="sol-exception-text">Grupo 1, <span class="sol-ion"><span class="sol-ion-base">NH</span><span class="sol-ion-scripts"><span class="sup">+</sup><span class="sub">4</span></span></span> <span class="sol-pill sol-pill-soluble">Soluble</span></td>
                             </tr>
                             <tr>
-                                <td><span class="sol-anion-name"><span class="sol-ion"><span class="sol-ion-base">PO</span><span class="sol-ion-scripts"><span class="sup">3−</span><span class="sub">4</span></span></span></span><span class="sol-anion-label">Phosphate</span></td>
+                                <td><span class="sol-anion-name"><span class="sol-ion"><span class="sol-ion-base">PO</span><span class="sol-ion-scripts"><span class="sup">3−</span><span class="sub">4</span></span></span></span><span class="sol-anion-label">Fosfato</span></td>
                                 <td><span class="sol-pill sol-pill-insoluble">Insol.</span></td>
-                                <td class="sol-exception-text">Group 1, <span class="sol-ion"><span class="sol-ion-base">NH</span><span class="sol-ion-scripts"><span class="sup">+</span><span class="sub">4</span></span></span> <span class="sol-pill sol-pill-soluble">Soluble</span></td>
+                                <td class="sol-exception-text">Grupo 1, <span class="sol-ion"><span class="sol-ion-base">NH</span><span class="sol-ion-scripts"><span class="sup">+</span><span class="sub">4</span></span></span> <span class="sol-pill sol-pill-soluble">Soluble</span></td>
                             </tr>
                             <tr>
-                                <td><span class="sol-anion-name">S<sup class="sol-sup-high">2−</sup></span><span class="sol-anion-label">Sulfide</span></td>
+                                <td><span class="sol-anion-name">S<sup class="sol-sup-high">2−</sup></span><span class="sol-anion-label">Sulfuro</span></td>
                                 <td><span class="sol-pill sol-pill-insoluble">Insol.</span></td>
-                                <td class="sol-exception-text">Group 1, Group 2, <span class="sol-ion"><span class="sol-ion-base">NH</span><span class="sol-ion-scripts"><span class="sup">+</span><span class="sub">4</span></span></span> <span class="sol-pill sol-pill-soluble">Sol.</span></td>
+                                <td class="sol-exception-text">Grupo 1, grupo 2, <span class="sol-ion"><span class="sol-ion-base">NH</span><span class="sol-ion-scripts"><span class="sup">+</span><span class="sub">4</span></span></span> <span class="sol-pill sol-pill-soluble">Sol.</span></td>
                             </tr>
                         </tbody>
                     </table>
@@ -3760,7 +3760,7 @@ function printReceipt(result) {
     wrapper.style.transform = "";
     wrapper.style.opacity = "";
     const now = new Date();
-    const timeStr = now.toLocaleTimeString("zh-CN", {
+    const timeStr = now.toLocaleTimeString("es", {
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",

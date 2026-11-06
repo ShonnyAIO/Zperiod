@@ -4,6 +4,7 @@ import {
   SUCCESS_ICON_SVG,
   flashSentState,
   submitSuggestion,
+  FEEDBACK_WEBHOOK_URL,
 } from "./feedbackController.js";
 import { getLang, onLangChange, t } from "./langController.js";
 
@@ -112,6 +113,11 @@ function initSettingsSuggestionForm() {
   const chipContainer = document.getElementById("suggest-chips");
 
   if (!suggInput || !suggSend) return;
+  if (!FEEDBACK_WEBHOOK_URL) {
+    const card = suggInput.closest(".sv-card-suggest");
+    if (card) card.style.display = "none";
+    return;
+  }
 
   initSuggestionChips({ chipContainer, suggInput });
 
@@ -126,7 +132,7 @@ function initSettingsSuggestionForm() {
     const text = suggInput.value.trim();
     if (!text) return;
 
-    await submitSuggestion(text, { source: "Zperiod Settings" });
+    await submitSuggestion(text, { source: "Periódica UCV Settings" });
 
     suggInput.value = "";
     resizeTextarea();
@@ -292,10 +298,8 @@ function initPreferencesCard() {
 
   if (clearBtn) {
     clearBtn.addEventListener("click", () => {
-      const msg = getLang() === "zh" 
-        ? "确定要清除所有本地数据（包括单位、主题、动画偏好）并重新加载吗？"
-        : "Are you sure you want to clear all local data (units, preferences) and reload?";
-        
+      const msg = "¿Seguro que quieres borrar todos los datos locales (unidades, tema, preferencias de animación) y recargar?";
+
       if (confirm(msg)) {
         localStorage.clear();
         sessionStorage.clear();

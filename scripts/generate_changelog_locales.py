@@ -10,21 +10,14 @@ from pathlib import Path
 
 from deep_translator import GoogleTranslator
 from deep_translator.exceptions import TranslationNotFound
-from opencc import OpenCC
 from requests.exceptions import RequestException
 
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT_FILE = ROOT / "js" / "data" / "changelogLocales.js"
-opencc = OpenCC("s2tw")
 
 LANGS = {
-    "zh": "zh-CN",
-    "fr": "fr",
-    "ru": "ru",
-    "fa": "fa",
-    "ur": "ur",
-    "tl": "tl",
+    "es": "es",
 }
 
 
@@ -107,13 +100,6 @@ def main() -> None:
             for entry in source
         }
 
-    payload["zh-Hant"] = {
-        version: {
-            "date": entry["date"],
-            "changes": [opencc.convert(change) for change in entry["changes"]],
-        }
-        for version, entry in payload["zh"].items()
-    }
 
     js = "// Localized changelog data for settings page\nexport const changelogLocales = " + json.dumps(
         payload,

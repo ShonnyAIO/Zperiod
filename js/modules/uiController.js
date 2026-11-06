@@ -17,6 +17,7 @@ import {
   renderScene,
 } from "./threeRenderer.js";
 import { initCardSlider } from "./cardSliderController.js";
+import { renderOrbitalControls } from "./orbitalControls.js";
 import { createEITController } from "./ui/eitController.js";
 import { initElementTutorial } from "./tutorialController.js";
 import {
@@ -26,11 +27,6 @@ import {
   elementLocales,
   fetchElementLocale,
 } from "./langController.js";
-import {
-  ELEMENT_NAMES_ZH_HANT,
-  ISOTOPE_ZH_HANT,
-  COMMON_ION_ZH_HANT,
-} from "../data/locales/zhHantUi.js";
 
 
 // v2 dataset stub — file removed; branches gated by zperiodVersion === 'new' are inert.
@@ -67,159 +63,83 @@ const ION_SUPERSCRIPT_MAP = {
 };
 
 const COMMON_ION_DETAIL_OVERRIDES = {
-  H: { "H⁺": { note: "Usually behaves as an acidic proton in water, often represented by hydronium." }, "H⁻": { note: "A strongly basic hydride ion found mainly in ionic hydrides such as NaH." } },
-  Fe: { "Fe²⁺": { note: "Ferrous iron; common in reducing environments and easily oxidized to Fe³⁺." }, "Fe³⁺": { note: "Ferric iron; the more oxidized common state in many salts and oxides." } },
-  Ti: { "Ti³⁺": { note: "A less stable reducing state that is readily oxidized to Ti⁴⁺." }, "Ti⁴⁺": { note: "The dominant titanium oxidation state, especially in TiO₂ and TiCl₄ chemistry." } },
-  Na: { "Na⁺": { note: "A very stable +1 ion commonly found in salts and aqueous solution." } },
-  Li: { "Li⁺": { note: "The only common lithium ion in ordinary compounds and many battery materials." } },
-  K: { "K⁺": { note: "The usual potassium ion in salts and a major biological electrolyte." } },
-  Mg: { "Mg²⁺": { note: "The normal magnesium ion in salts and an essential ion in biological systems." } },
-  Ca: { "Ca²⁺": { note: "The normal calcium ion in minerals, hard water, and biological signalling." } },
-  Al: { "Al³⁺": { note: "The usual aluminum ion in many salts, though it hydrolyses strongly in water." } },
-  O: { "O²⁻": { note: "The oxide ion is the common oxygen anion in many metal oxides." } },
-  N: { "N³⁻": { note: "Nitride occurs mainly in compounds with very electropositive metals." } },
-  P: { "P³⁻": { note: "Phosphide is mainly found in metal phosphides rather than free in water." } },
-  S: { "S²⁻": { note: "Sulfide is the common sulfur anion in metal sulfides and H2S chemistry." } },
-  F: { "F⁻": { note: "Fluoride is the stable halide ion found in minerals, water treatment, and enamel chemistry." } },
-  Cl: { "Cl⁻": { note: "The most common halide anion, stable in many salts and aqueous systems." } },
-  Br: { "Br⁻": { note: "Bromide is the common bromine anion found in salts and natural bromide-rich brines." } },
-  I: { "I⁻": { note: "Iodide is the stable iodine anion and the form used by the thyroid." } },
-  Sc: { "Sc³⁺": { note: "Scandium is found almost entirely in the +3 state in its compounds." } },
-  V: { "V²⁺": { note: "Vanadium(II) is a lower, reducing state that oxidizes readily in air." }, "V³⁺": { note: "Vanadium(III) is one of the common lower oxidation states in compounds." } },
-  Cr: { "Cr²⁺": { note: "Chromium(II) is a reducing ion that is readily oxidized to Cr3+." }, "Cr³⁺": { note: "Chromium(III) is the more stable common chromium ion in many salts." } },
-  Mn: { "Mn²⁺": { note: "Mn2+ is the most common simple manganese ion in ordinary chemistry." }, "Mn³⁺": { note: "Mn3+ is less stable than Mn2+ and is often stabilized in solids or complexes." } },
-  Co: { "Co²⁺": { note: "Cobalt(II) is the more common simple cobalt ion in salts." }, "Co³⁺": { note: "Cobalt(III) is more often stabilized in coordination complexes." } },
-  Ni: { "Ni²⁺": { note: "Nickel(II) is the most common nickel ion in ordinary compounds." }, "Ni³⁺": { note: "Nickel(III) exists, but it is less common than the Ni2+ state." } },
-  Cu: { "Cu⁺": { note: "Copper(I) appears in some minerals and coordination compounds." }, "Cu²⁺": { note: "Copper(II) is the more common simple copper ion in many salts." } },
-  Zn: { "Zn²⁺": { note: "Zinc almost always appears as Zn²⁺ in simple compounds and biology." } },
-  Ga: { "Ga³⁺": { note: "Gallium usually appears in the +3 state in its compounds." } },
-  Ag: { "Ag⁺": { note: "Silver usually appears as Ag+ in salts such as silver nitrate and silver halides." } },
-  Rb: { "Rb⁺": { note: "Rubidium forms the normal +1 alkali-metal ion, much like potassium." } },
-  Sr: { "Sr²⁺": { note: "Strontium commonly occurs as the +2 ion in salts and minerals." } },
-  Y: { "Y³⁺": { note: "Yttrium is normally found in the +3 state in compounds and minerals." } },
-  Cd: { "Cd²⁺": { note: "Cadmium usually occurs as Cd2+ in its compounds." } },
-  In: { "In³⁺": { note: "Indium commonly occurs as In3+, though In+ compounds are also known." } },
-  Sn: { "Sn²⁺": { note: "Tin(II) is one of the two common tin ion states in salts and reducing compounds." }, "Sn⁴⁺": { note: "Tin(IV) is the more oxidized common state found in compounds such as SnO₂." } },
-  Pb: { "Pb²⁺": { note: "Lead(II) is the more common simple lead ion in many salts and minerals." }, "Pb⁴⁺": { note: "Lead(IV) occurs in more strongly oxidized lead compounds." } },
-  Ba: { "Ba²⁺": { note: "Barium commonly occurs as the +2 ion in salts such as sulfate and carbonate." } },
-  Hg: { "Hg₂²⁺": { note: "Mercury(I) commonly exists as the dimeric mercurous ion Hg₂²⁺." }, "Hg²⁺": { note: "Mercury(II) is the more oxidized common mercury ion in many compounds." } },
-  Au: { "Au⁺": { note: "Gold(I) is one of the common oxidation states in gold coordination chemistry." }, "Au³⁺": { note: "Gold(III) is the higher common state in many gold complexes." } },
-  Tl: { "Tl⁺": { note: "Thallium(I) is the more stable common thallium ion in many compounds." }, "Tl³⁺": { note: "Thallium(III) is the more oxidized and less stable common state." } },
-  Bi: { "Bi³⁺": { note: "Bismuth(III) is the most common oxidation state of bismuth in compounds." } },
-  At: { "At⁻": { note: "Astatide is a predicted halide-like anion, expected to resemble iodide." } },
-  U: { "U⁴⁺": { note: "Uranium(IV) is important in UO2, a major nuclear fuel material." } },
+  H: { "H⁺": { note: "En agua suele comportarse como un protón ácido, representado a menudo como hidronio." }, "H⁻": { note: "Ion hidruro fuertemente básico, presente sobre todo en hidruros iónicos como el NaH." } },
+  Fe: { "Fe²⁺": { note: "Hierro ferroso; común en ambientes reductores y se oxida fácilmente a Fe³⁺." }, "Fe³⁺": { note: "Hierro férrico; el estado más oxidado y común en muchas sales y óxidos." } },
+  Ti: { "Ti³⁺": { note: "Estado reductor menos estable que se oxida fácilmente a Ti⁴⁺." }, "Ti⁴⁺": { note: "El estado de oxidación dominante del titanio, sobre todo en la química del TiO₂ y el TiCl₄." } },
+  Na: { "Na⁺": { note: "Ion +1 muy estable, común en sales y en solución acuosa." } },
+  Li: { "Li⁺": { note: "El único ion común del litio en compuestos ordinarios y en muchos materiales de baterías." } },
+  K: { "K⁺": { note: "El ion habitual del potasio en sales y un electrolito biológico fundamental." } },
+  Mg: { "Mg²⁺": { note: "El ion normal del magnesio en sales y un ion esencial en los sistemas biológicos." } },
+  Ca: { "Ca²⁺": { note: "El ion normal del calcio en minerales, en el agua dura y en la señalización biológica." } },
+  Al: { "Al³⁺": { note: "El ion habitual del aluminio en muchas sales, aunque se hidroliza fuertemente en agua." } },
+  O: { "O²⁻": { note: "El ion óxido es el anión común del oxígeno en muchos óxidos metálicos." } },
+  N: { "N³⁻": { note: "El nitruro aparece sobre todo en compuestos con metales muy electropositivos." } },
+  P: { "P³⁻": { note: "El fosfuro se encuentra principalmente en fosfuros metálicos, no libre en agua." } },
+  S: { "S²⁻": { note: "El sulfuro es el anión común del azufre en sulfuros metálicos y en la química del H₂S." } },
+  F: { "F⁻": { note: "El fluoruro es el ion haluro estable presente en minerales, en el tratamiento del agua y en el esmalte dental." } },
+  Cl: { "Cl⁻": { note: "El anión haluro más común, estable en muchas sales y sistemas acuosos." } },
+  Br: { "Br⁻": { note: "El bromuro es el anión común del bromo en sales y salmueras naturales ricas en bromuro." } },
+  I: { "I⁻": { note: "El yoduro es el anión estable del yodo y la forma que usa la tiroides." } },
+  Sc: { "Sc³⁺": { note: "El escandio se encuentra casi siempre en estado +3 en sus compuestos." } },
+  V: { "V²⁺": { note: "El vanadio(II) es un estado bajo y reductor que se oxida fácilmente en el aire." }, "V³⁺": { note: "El vanadio(III) es uno de los estados de oxidación bajos más comunes en compuestos." } },
+  Cr: { "Cr²⁺": { note: "El cromo(II) es un ion reductor que se oxida fácilmente a Cr³⁺." }, "Cr³⁺": { note: "El cromo(III) es el ion de cromo común más estable en muchas sales." } },
+  Mn: { "Mn²⁺": { note: "El Mn²⁺ es el ion simple de manganeso más común en la química ordinaria." }, "Mn³⁺": { note: "El Mn³⁺ es menos estable que el Mn²⁺ y suele estabilizarse en sólidos o complejos." } },
+  Co: { "Co²⁺": { note: "El cobalto(II) es el ion simple de cobalto más común en sales." }, "Co³⁺": { note: "El cobalto(III) se estabiliza con más frecuencia en complejos de coordinación." } },
+  Ni: { "Ni²⁺": { note: "El níquel(II) es el ion de níquel más común en compuestos ordinarios." }, "Ni³⁺": { note: "El níquel(III) existe, pero es menos común que el Ni²⁺." } },
+  Cu: { "Cu⁺": { note: "El cobre(I) aparece en algunos minerales y compuestos de coordinación." }, "Cu²⁺": { note: "El cobre(II) es el ion simple de cobre más común en muchas sales." } },
+  Zn: { "Zn²⁺": { note: "El zinc aparece casi siempre como Zn²⁺ en compuestos simples y en biología." } },
+  Ga: { "Ga³⁺": { note: "El galio suele aparecer en estado +3 en sus compuestos." } },
+  Ag: { "Ag⁺": { note: "La plata suele aparecer como Ag⁺ en sales como el nitrato de plata y los haluros de plata." } },
+  Rb: { "Rb⁺": { note: "El rubidio forma el ion +1 típico de los metales alcalinos, muy parecido al potasio." } },
+  Sr: { "Sr²⁺": { note: "El estroncio aparece comúnmente como ion +2 en sales y minerales." } },
+  Y: { "Y³⁺": { note: "El itrio se encuentra normalmente en estado +3 en compuestos y minerales." } },
+  Cd: { "Cd²⁺": { note: "El cadmio suele aparecer como Cd²⁺ en sus compuestos." } },
+  In: { "In³⁺": { note: "El indio aparece comúnmente como In³⁺, aunque también se conocen compuestos de In⁺." } },
+  Sn: { "Sn²⁺": { note: "El estaño(II) es uno de los dos estados comunes del estaño en sales y compuestos reductores." }, "Sn⁴⁺": { note: "El estaño(IV) es el estado común más oxidado, presente en compuestos como el SnO₂." } },
+  Pb: { "Pb²⁺": { note: "El plomo(II) es el ion simple de plomo más común en muchas sales y minerales." }, "Pb⁴⁺": { note: "El plomo(IV) aparece en compuestos de plomo más fuertemente oxidados." } },
+  Ba: { "Ba²⁺": { note: "El bario aparece comúnmente como ion +2 en sales como el sulfato y el carbonato." } },
+  Hg: { "Hg₂²⁺": { note: "El mercurio(I) existe comúnmente como el ion mercurioso dimérico Hg₂²⁺." }, "Hg²⁺": { note: "El mercurio(II) es el ion de mercurio común más oxidado en muchos compuestos." } },
+  Au: { "Au⁺": { note: "El oro(I) es uno de los estados de oxidación comunes en la química de coordinación del oro." }, "Au³⁺": { note: "El oro(III) es el estado común más alto en muchos complejos de oro." } },
+  Tl: { "Tl⁺": { note: "El talio(I) es el ion de talio común más estable en muchos compuestos." }, "Tl³⁺": { note: "El talio(III) es el estado común más oxidado y menos estable." } },
+  Bi: { "Bi³⁺": { note: "El bismuto(III) es el estado de oxidación más común del bismuto en compuestos." } },
+  At: { "At⁻": { note: "El astaturo es un anión predicho, parecido a los haluros, que se espera similar al yoduro." } },
+  U: { "U⁴⁺": { note: "El uranio(IV) es importante en el UO₂, uno de los principales combustibles nucleares." } },
 };
 
 const ISOTOPE_DETAIL_OVERRIDES = {
-  H: { "H-1": "Protium is the most abundant hydrogen isotope in nature.", "H-2": "Deuterium is stable and commonly used in heavy water and tracing studies.", "H-3": "Tritium is radioactive and widely known from fusion and tracing applications." },
-  Li: { "Li-6": "Lithium-6 is important in neutron reactions and tritium production.", "Li-7": "Lithium-7 is the more abundant natural isotope of lithium." },
-  C: { "C-13": "Carbon-13 is stable and widely used in NMR and isotope tracing.", "C-14": "Carbon-14 is radioactive and well known for radiocarbon dating." },
-  Fe: { "Fe-56": "Iron-56 is the most abundant natural isotope of iron." },
-  Mn: { "Mn-55": "Manganese-55 is the only stable natural isotope of manganese." },
-  Co: { "Co-59": "Cobalt-59 is the only stable natural isotope of cobalt." },
-  I: { "I-127": "Iodine-127 is the only stable natural isotope of iodine." },
-  U: { "U-235": "Uranium-235 is the key fissile isotope used in many nuclear applications.", "U-238": "Uranium-238 is the most abundant uranium isotope and is weakly radioactive." },
-  Tc: { "Tc-99": "Technetium-99 is a long-lived radioactive isotope of a fully radioactive element." },
+  H: { "H-1": "El protio es el isótopo de hidrógeno más abundante en la naturaleza.", "H-2": "El deuterio es estable y se usa mucho en agua pesada y en estudios con trazadores.", "H-3": "El tritio es radiactivo y conocido por sus aplicaciones en fusión y como trazador." },
+  Li: { "Li-6": "El litio-6 es importante en reacciones con neutrones y en la producción de tritio.", "Li-7": "El litio-7 es el isótopo natural más abundante del litio." },
+  C: { "C-13": "El carbono-13 es estable y se usa mucho en RMN y como trazador isotópico.", "C-14": "El carbono-14 es radiactivo y muy conocido por la datación por radiocarbono." },
+  Fe: { "Fe-56": "El hierro-56 es el isótopo natural más abundante del hierro." },
+  Mn: { "Mn-55": "El manganeso-55 es el único isótopo natural estable del manganeso." },
+  Co: { "Co-59": "El cobalto-59 es el único isótopo natural estable del cobalto." },
+  I: { "I-127": "El yodo-127 es el único isótopo natural estable del yodo." },
+  U: { "U-235": "El uranio-235 es el isótopo fisible clave en muchas aplicaciones nucleares.", "U-238": "El uranio-238 es el isótopo de uranio más abundante y es débilmente radiactivo." },
+  Tc: { "Tc-99": "El tecnecio-99 es un isótopo radiactivo de vida larga de un elemento totalmente radiactivo." },
 };
 
-const ELEMENT_NAMES_ZH = [
-  "", "氢", "氦", "锂", "铍", "硼", "碳", "氮", "氧", "氟", "氖",
-  "钠", "镁", "铝", "硅", "磷", "硫", "氯", "氩",
-  "钾", "钙", "钪", "钛", "钒", "铬", "锰", "铁", "钴", "镍", "铜", "锌", "镓", "锗", "砷", "硒", "溴", "氪",
-  "铷", "锶", "钇", "锆", "铌", "钼", "锝", "钌", "铑", "钯", "银", "镉", "铟", "锡", "锑", "碲", "碘", "氙",
-  "铯", "钡", "镧", "铈", "镨", "钕", "钷", "钐", "铕", "钆", "铽", "镝", "钬", "铒", "铥", "镱", "镥", "铪", "钽", "钨", "铼", "锇", "铱", "铂", "金", "汞", "铊", "铅", "铋", "钋", "砹", "氡",
-  "钫", "镭", "锕", "钍", "镤", "铀", "镎", "钚", "镅", "锔", "锫", "锎", "锿", "镄", "钔", "锘", "铹", "𬬻", "𬭊", "𬭳", "𬭛", "𬭤", "䥑", "𫟼", "𬬭", "鎶", "鿭", "𫓧", "镆", "𫟷", "鿬", "鿫"
-];
-
-const ELEMENT_PINYIN_ZH = [
-  "", "qīng", "hài", "lǐ", "pí", "péng", "tàn", "dàn", "yǎng", "fú", "nǎi",
-  "nà", "měi", "lǚ", "guī", "lín", "liú", "lǜ", "yà",
-  "jiǎ", "gài", "kàng", "tài", "fán", "gè", "měng", "tiě", "gǔ", "niè", "tóng", "xīn", "jiā", "zhě", "shēn", "xī", "xiù", "kè",
-  "rú", "sī", "yǐ", "gào", "ní", "mù", "dé", "liǎo", "lǎo", "bǎ", "yín", "gé", "yīn", "xī", "tī", "dì", "diǎn", "xiān",
-  "sè", "bèi", "lán", "shì", "pǔ", "nǚ", "pǒ", "shān", "yǒu", "gá", "tè", "dī", "huǒ", "ěr", "diū", "yì", "lǔ", "hā", "tǎn", "wū", "lái", "é", "yī", "bó", "jīn", "gǒng", "tā", "qiān", "bì", "pō", "ài", "dōng",
-  "fāng", "léi", "ā", "tǔ", "pú", "yóu", "ná", "bù", "méi", "jū", "pèi", "kāi", "āi", "fèi", "mén", "nuò", "láo", "lú", "dū", "xǐ", "bō", "hēi", "mài", "dá", "lún", "gē", "nǐ", "fū", "mò", "lì", "tián", "ào"
-];
-
-function getElementAnnotation(number, lang) {
-  if (lang === "zh") return ELEMENT_PINYIN_ZH[number] || "";
-  // Traditional Chinese should prefer zhuyin rather than pinyin.
-  return "";
-}
+// Spanish summaries of elementsData isotopeNotes that don't follow the "Synthetic element." pattern.
+const ISOTOPE_NOTES_ES = {
+  Tc: "Tc-97, Tc-98 y Tc-99 son los isótopos más longevos; el Tc-99m se usa mucho en imagen médica.",
+  Pm: "Pm-145 (t½ 17,7 años) y Pm-147 (t½ 2,62 años) son los isótopos más longevos.",
+  Ta: "El ¹⁸⁰ᵐTa natural es un isómero nuclear metaestable, el único que existe en la naturaleza.",
+  W: "El wolframio natural tiene cinco isótopos; ¹⁸⁰W y ¹⁸⁶W son muy levemente radiactivos.",
+  Bi: "El ²⁰⁹Bi es α-radiactivo con una vida media extraordinaria de ~2,01×10¹⁹ años.",
+  At: "At-218 y At-219 aparecen en trazas en las cadenas de desintegración natural del uranio.",
+  Rn: "Los isótopos naturales del radón son ²¹⁹Rn (actinón), ²²⁰Rn (torón) y ²²²Rn (radón).",
+  Np: "El neptunio es principalmente sintético; Np-237 (t½ 2,14×10⁶ años) es su isótopo más longevo.",
+  Pu: "El plutonio es principalmente sintético; Pu-244 (t½ 8,0×10⁷ años) es su isótopo más longevo.",
+};
 
 function localizeElementName(element) {
   if (!element || !element.number) return "";
-  
+
   // Special translation for Lanthanide/Actinide block placeholders
   if (element.symbol === "La-Lu") return t("tableLegend.lanthanide");
   if (element.symbol === "Ac-Lr") return t("tableLegend.actinide");
 
-  const lang = getLang();
-  if (lang.startsWith("zh")) {
-    const useTraditionalChinese = lang === "zh-Hant";
-    const localizedNames = useTraditionalChinese ? ELEMENT_NAMES_ZH_HANT : ELEMENT_NAMES_ZH;
-    return localizedNames[element.number] || element.name;
-  }
-  if (elementLocales[lang]?.[element.number]?.name) {
-    return elementLocales[lang][element.number].name;
-  }
-  return element.name;
+  return elementLocales[getLang()]?.[element.number]?.name || element.name;
 }
-
-const ISOTOPE_ZH = {
-  H: { "H-1": "氕是自然界中最丰富的氢同位素。", "H-2": "氘是稳定的同位素，广泛用于重水和示踪研究。", "H-3": "氚具有放射性，被广泛应用于核聚变和示踪技术。" },
-  Li: { "Li-6": "锂-6 在中子反应和氚的生产中非常重要。", "Li-7": "锂-7 是自然界中更丰富的锂同位素。" },
-  C: { "C-13": "碳-13 是稳定的同位素，广泛用于核磁共振（NMR）和同位素示踪。", "C-14": "碳-14 具有放射性，因用于放射性碳定年法而闻名。" },
-  Fe: { "Fe-56": "铁-56 是自然界中最丰富的铁同位素。" },
-  Mn: { "Mn-55": "锰-55 是锰唯一的天然稳定同位素。" },
-  Co: { "Co-59": "钴-59 是钴唯一的天然稳定同位素。" },
-  I: { "I-127": "碘-127 是碘唯一的天然稳定同位素。" },
-  U: { "U-235": "铀-235 是用于许多核应用的关键裂变同位素。", "U-238": "铀-238 是最丰富的铀同位素，具有微弱的放射性。" },
-  Tc: { "Tc-99": "锝-99 是一种长寿命的放射性同位素，也是锝元素的代表。" },
-};
-
-const COMMON_ION_ZH = {
-  H: { "H⁺": "在水中通常作为酸性质子存在，常以水合氢离子表示。", "H⁻": "强碱性的氢负离子，主要存在于如 NaH 这样的离子型氢化物中。" },
-  Fe: { "Fe²⁺": "亚铁离子；常见于还原环境，容易被氧化为 Fe³⁺。", "Fe³⁺": "铁离子；是许多铁盐和氧化物中更常见的较高氧化态。" },
-  Ti: { "Ti³⁺": "不太稳定的还原态，容易被氧化为 Ti⁴⁺。", "Ti⁴⁺": "钛的主要氧化态，尤其在 TiO₂ 和 TiCl₄ 中最常见。" },
-  Na: { "Na⁺": "非常稳定的 +1 价离子，广泛存在于盐和水溶液中。" },
-  Li: { "Li⁺": "在普通化合物和许多电池材料中唯一的常见锂离子。" },
-  K: { "K⁺": "这是一种稳定的钾离子，也是一种重要的生物电解质。" },
-  Mg: { "Mg²⁺": "普通镁离子，是生物系统中必不可少的离子。" },
-  Ca: { "Ca²⁺": "常见的钙离子，存在于矿物质、硬水和生物信号传导中。" },
-  Al: { "Al³⁺": "铝的常见离子形式，在水中会发生强烈水解。" },
-  O: { "O²⁻": "氧离子是许多金属氧化物中的常见阴离子。" },
-  N: { "N³⁻": "氮离子主要存在于由极度电正性金属组成的化合物中。" },
-  P: { "P³⁻": "磷离子主要存在于金属磷化物中，很少游离在水中。" },
-  S: { "S²⁻": "硫离子是金属硫化物和 H2S 化学中的常见硫阴离子。" },
-  F: { "F⁻": "氟离子是稳定的卤素离子，存在于矿物、水处理和牙釉质中。" },
-  Cl: { "Cl⁻": "最常见的卤素阴离子，在许多盐和水体系中非常稳定。" },
-  Br: { "Br⁻": "溴离子，常见于盐和天然富溴卤水中。" },
-  I: { "I⁻": "碘离子，是甲状腺利用的稳定形态。" },
-  Sc: { "Sc³⁺": "钪在其化合物中几乎全部以 +3 价状态存在。" },
-  V: { "V²⁺": "钒(II) 是一种较低的还原态，在空气中容易被氧化。", "V³⁺": "钒(III) 是化合物中常见的低氧化态之一。" },
-  Cr: { "Cr²⁺": "铬(II) 是一种还原性离子，极易被氧化为 Cr³⁺。", "Cr³⁺": "铬(III) 是许多盐中更稳定的常见铬离子态。" },
-  Mn: { "Mn²⁺": "Mn²⁺ 是普通化学中最常见、最简单的锰离子。", "Mn³⁺": "Mn³⁺ 不及 Mn²⁺ 稳定，常被固定在固体或配合物中。" },
-  Co: { "Co²⁺": "钴(II) 是盐中更常见的简单钴离子态。", "Co³⁺": "钴(III) 更常在配位配合物中被稳定下来。" },
-  Ni: { "Ni²⁺": "镍(II) 是普通化合物中最常用的镍离子。", "Ni³⁺": "存在镍(III)，但不如 Ni²⁺ 常见。" },
-  Cu: { "Cu⁺": "铜(I) 出现在部分矿物和配位化合物中。", "Cu²⁺": "铜(II) 是许多盐中更常见的简单铜离子。" },
-  Zn: { "Zn²⁺": "锌在简单化合物和生物体内几乎总是以 Zn²⁺ 形式存在。" },
-  Ga: { "Ga³⁺": "镓在其化合物中通常表现为 +3 价。" },
-  Ag: { "Ag⁺": "银通常以 Ag⁺ 的形式存在于硝酸银和卤化银等盐中。" },
-  Rb: { "Rb⁺": "铷形成普通的 +1 价碱金属离子，性质与钾非常相似。" },
-  Sr: { "Sr²⁺": "锶通常以 +2 价离子的形式存在于盐和矿物中。" },
-  Y: { "Y³⁺": "钇通常在其化合物和矿石中表现为 +3 价态。" },
-  Cd: { "Cd²⁺": "镉通常在其化合物中以 Cd²⁺ 的形式出现。" },
-  In: { "In³⁺": "铟通常以 In³⁺ 的形式出现，尽管也存在 In⁺ 化合物。" },
-  Sn: { "Sn²⁺": "锡(II) 是盐和还原性物质中两种常见的锡离子之一。", "Sn⁴⁺": "锡(IV) 是更高氧化态的离子，见于如 SnO₂ 这样的化合物。" },
-  Pb: { "Pb²⁺": "铅(II) 是许多铅盐和矿石中更常见的简单铅离子。", "Pb⁴⁺": "铅(IV) 出现在氧化性极强的铅化合物中。" },
-  Ba: { "Ba²⁺": "钡通常以 +2 价离子的形式存在于硫酸盐和碳酸盐等盐中。" },
-  Hg: { "Hg₂²⁺": "亚汞通常以二聚体离子 Hg₂²⁺ 的形式存在。", "Hg²⁺": "汞(II) 是许多化合物中更常见的较高氧化态汞离子。" },
-  Au: { "Au⁺": "金(I) 是金配位化学中常见的氧化态之一。", "Au³⁺": "金(III) 是许多金络合物中较高级别的常见状态。" },
-  Tl: { "Tl⁺": "在许多化合物中，铊(I) 是比铊(III) 更稳定的普通铊离子。", "Tl³⁺": "铊(III) 是氧化程度更高但不太稳定的常见状态。" },
-  Bi: { "Bi³⁺": "铋(III) 是化合物中最常表现出的铋氧化态。" },
-  At: { "At⁻": "砹离子被预测具有类似卤素的阴离子结构，可能类似于碘离子。" },
-  U: { "U⁴⁺": "铀(IV) 在 UO₂ 中十分重要，这是一种主要的核燃料。" }
-};
 
 function escapeHtml(text) {
   return String(text ?? "")
@@ -246,55 +166,12 @@ function unicodeToHtmlGlobal(text) {
 }
 
 function localizeNoAdditionalData() {
-  const lang = getLang();
-  if (lang === "zh-Hant") return "暫無更多詳細資料。";
-  if (lang.startsWith("zh")) return "暂无更多详细数据。";
-  if (lang.startsWith("ru")) return "Дополнительные данные отсутствуют.";
-  if (lang.startsWith("fr")) return "Aucune information supplementaire disponible.";
-  if (lang.startsWith("fa")) return "اطلاعات تکمیلی موجود نیست.";
-  if (lang.startsWith("ur")) return "مزید تفصیلی معلومات دستیاب نہیں۔";
-  if (lang.startsWith("tl")) return "Wala pang karagdagang detalye.";
-  return "No additional data available.";
-}
-
-function buildLocalizedCommonIonNote(element, symbol) {
-  const lang = getLang();
-  const localizedName = localizeElementName(element);
-
-  if (lang.startsWith("fr")) {
-    return `${symbol} est un ion courant de l'element ${localizedName} dans ses composes usuels.`;
-  }
-  if (lang.startsWith("ru")) {
-    return `${symbol} — распространенный ион элемента ${localizedName} в его обычных соединениях.`;
-  }
-  if (lang.startsWith("fa")) {
-    return `${symbol} یکی از یون‌های رایج ${localizedName} در ترکیبات معمول آن است.`;
-  }
-  if (lang.startsWith("ur")) {
-    return `${symbol} ${localizedName} کا ایک عام آئن ہے جو اس کے عام مرکبات میں پایا جاتا ہے۔`;
-  }
-  if (lang.startsWith("tl")) {
-    return `${symbol} ay isang karaniwang ion ng ${localizedName} sa mga karaniwang compound nito.`;
-  }
-  return `${symbol} is a common ion of ${element.name} in its usual compounds.`;
+  return "No hay más datos disponibles.";
 }
 
 function buildCommonIonDetailMarkup(element, symbol) {
-  const override = COMMON_ION_DETAIL_OVERRIDES[element.symbol]?.[symbol];
-  let note = override?.note || localizeNoAdditionalData();
-  
-  const lang = getLang();
-  if (lang.startsWith("zh")) {
-    const commonIonNotes = lang === "zh-Hant" ? COMMON_ION_ZH_HANT : COMMON_ION_ZH;
-    if (!override?.note) {
-      note = localizeNoAdditionalData();
-    } else if (commonIonNotes[element.symbol]?.[symbol]) {
-      note = commonIonNotes[element.symbol][symbol];
-    }
-  } else if (lang !== "en") {
-    note = buildLocalizedCommonIonNote(element, symbol);
-  }
-  
+  const note = COMMON_ION_DETAIL_OVERRIDES[element.symbol]?.[symbol]?.note
+    || `${symbol} es un ion común de ${localizeElementName(element).toLowerCase()} en sus compuestos habituales.`;
   return `<div class="ion-item-detail-inner"><p class="ion-detail-note">${escapeHtml(note)}</p></div>`;
 }
 
@@ -329,160 +206,25 @@ function localizeSimpleStatusText(value, fallback = "—") {
 function localizeValence(val) {
   if (!val || val === "—") return "—";
   if (val === "Unknown") return t("elementL1.unknown");
-  const lang = getLang();
-  if (lang.startsWith("zh")) {
-    const replacements = lang === "zh-Hant"
-      ? [
-          [/Variable \(outer s \+ d \+ f\)/i, "可變 (外層 s + d + f)"],
-          [/Variable \(outer s \+ d\)/i, "可變 (外層 s + d)"],
-          [/Variable \(outer s \+ f\)/i, "可變 (外層 s + f)"],
-          [/Variable \(outer d only here\)/i, "可變 (僅外層 d)"],
-          [/Variable/i, "可變"],
-          [/\(d-subshell is full\)/gi, "(d 子殼層已充滿)"],
-          [/\(s-subshell only\)/gi, "(僅 s 子殼層)"],
-          [/\(f-subshell filling\)/gi, "(f 子殼層填充中)"],
-          [/\(half-filled d\)/gi, "(d 半填充)"],
-          [/\(full d before s\)/gi, "(d 先於 s 充滿)"],
-          [/\(d-subshell\)/gi, "(d 子殼層)"],
-          [/subshell/gi, "子殼層"],
-          [/outer/gi, "外層"],
-        ]
-      : [
-          [/Variable \(outer s \+ d \+ f\)/i, "可变 (外层 s + d + f)"],
-          [/Variable \(outer s \+ d\)/i, "可变 (外层 s + d)"],
-          [/Variable \(outer s \+ f\)/i, "可变 (外层 s + f)"],
-          [/Variable \(outer d only here\)/i, "可变 (仅外层 d)"],
-          [/Variable/i, "可变"],
-          [/\(d-subshell is full\)/gi, "(d 子壳层已充满)"],
-          [/\(s-subshell only\)/gi, "(仅 s 子壳层)"],
-          [/\(f-subshell filling\)/gi, "(f 子壳层填充中)"],
-          [/\(half-filled d\)/gi, "(d 半填充)"],
-          [/\(full d before s\)/gi, "(d 先于 s 充满)"],
-          [/\(d-subshell\)/gi, "(d 子壳层)"],
-          [/subshell/gi, "子壳层"],
-          [/outer/gi, "外层"],
-        ];
-
-    return replacements.reduce(
-      (localized, [pattern, replacement]) => localized.replace(pattern, replacement),
-      String(val),
-    );
-  }
-  if (lang.startsWith("ru")) {
-    return String(val)
-      .replace(/Variable \(outer s \+ d \+ f\)/i, "Переменная (внешние s + d + f)")
-      .replace(/Variable \(outer s \+ d\)/i, "Переменная (внешние s + d)")
-      .replace(/Variable \(outer s \+ f\)/i, "Переменная (внешние s + f)")
-      .replace(/Variable \(outer d only here\)/i, "Переменная (только внешние d)")
-      .replace(/Variable/i, "Переменная")
-      .replace(/\(d-subshell is full\)/gi, "(d-подоболочка заполнена)")
-      .replace(/\(s-subshell only\)/gi, "(только s-подоболочка)")
-      .replace(/\(f-subshell filling\)/gi, "(f-подоболочка заполняется)")
-      .replace(/subshell/gi, "подоболочка")
-      .replace(/outer/gi, "внешние");
-  }
-
-  if (lang === "ur") {
-    return String(val)
-      .replace(/Variable \(outer s \+ d \+ f\)/i, "متغیر (بیرونی s + d + f)")
-      .replace(/Variable \(outer s \+ d\)/i, "متغیر (بیرونی s + d)")
-      .replace(/Variable \(outer s \+ f\)/i, "متغیر (بیرونی s + f)")
-      .replace(/Variable \(outer d only here\)/i, "متغیر (یہاں صرف بیرونی d)")
-      .replace(/Variable/i, "متغیر")
-      .replace(/\(d-subshell is full\)/gi, "(d-سب شیل بھرا ہوا ہے)")
-      .replace(/\(s-subshell only\)/gi, "(صرف s-سب شیل)")
-      .replace(/\(f-subshell filling\)/gi, "(f-سب شیل بھر رہا ہے)")
-      .replace(/\(acts like 1\)/gi, "(1 کی طرح کام کرتا ہے)")
-      .replace(/subshell/gi, "سب شیل")
-      .replace(/outer/gi, "بیرونی");
-  }
-  if (lang === "fa") {
-    return String(val)
-      .replace(/Variable \(outer s \+ d \+ f\)/i, "متغیر (خارجی s + d + f)")
-      .replace(/Variable \(outer s \+ d\)/i, "متغیر (خارجی s + d)")
-      .replace(/Variable \(outer s \+ f\)/i, "متغیر (خارجی s + f)")
-      .replace(/Variable \(outer d only here\)/i, "متغیر (فقط خارجی d اینجا)")
-      .replace(/Variable/i, "متغیر")
-      .replace(/\(d-subshell is full\)/gi, "(زیرلایه d پر است)")
-      .replace(/\(s-subshell only\)/gi, "(فقط زیرلایه s)")
-      .replace(/\(f-subshell filling\)/gi, "(در حال پر شدن زیرلایه f)")
-      .replace(/\(acts like 1\)/gi, "(مانند 1 عمل می کند)")
-      .replace(/subshell/gi, "زیرلایه")
-      .replace(/outer/gi, "خارجی");
-  }
-  if (lang === "fr") {
-    return String(val)
-      .replace(/Variable \(outer s \+ d \+ f\)/i, "Variable (s + d + f externes)")
-      .replace(/Variable \(outer s \+ d\)/i, "Variable (s + d externes)")
-      .replace(/Variable \(outer s \+ f\)/i, "Variable (s + f externes)")
-      .replace(/Variable \(outer d only here\)/i, "Variable (seulement d externe ici)")
-      .replace(/Variable/i, "Variable")
-      .replace(/\(d-subshell is full\)/gi, "(la sous-couche d est pleine)")
-      .replace(/\(acts like 1\)/gi, "(agit comme 1)")
-      .replace(/subshell/gi, "sous-couche")
-      .replace(/outer/gi, "externe");
-  }
-  if (lang === "tl") {
-    return String(val)
-      .replace(/Variable \(outer s \+ d \+ f\)/i, "Nagbabago (panlabas na s + d + f)")
-      .replace(/Variable \(outer s \+ d\)/i, "Nagbabago (panlabas na s + d)")
-      .replace(/Variable \(outer s \+ f\)/i, "Nagbabago (panlabas na s + f)")
-      .replace(/Variable \(outer d only here\)/i, "Nagbabago (d lang panlabas dito)")
-      .replace(/Variable/i, "Nagbabago")
-      .replace(/\(d-subshell is full\)/gi, "(puno na ang d-subshell)")
-      .replace(/\(acts like 1\)/gi, "(kumikilos bilang 1)")
-      .replace(/subshell/gi, "subshell")
-      .replace(/outer/gi, "panlabas");
-  }
-  return val;
+  return String(val)
+    .replace(/Variable \(outer s \+ d \+ f\)/i, "Variable (s + d + f externos)")
+    .replace(/Variable \(outer s \+ d\)/i, "Variable (s + d externos)")
+    .replace(/Variable \(outer s \+ f\)/i, "Variable (s + f externos)")
+    .replace(/Variable \(outer d only here\)/i, "Variable (aquí solo d externo)")
+    .replace(/\(d-subshell is full\)/gi, "(subcapa d llena)")
+    .replace(/\(acts like 1\)/gi, "(actúa como 1)");
 }
 
 function localizeNA() {
-  const lang = getLang();
-  if (lang === "zh-Hant") return "暫無";
-  if (lang.startsWith("zh")) return "暂无";
-  if (lang.startsWith("ru")) return "Н/Д";
-  if (lang.startsWith("fr")) return "N/D";
-  if (lang.startsWith("fa")) return "ناموجود";
-  if (lang.startsWith("ur")) return "دستیاب نہیں";
-  if (lang.startsWith("tl")) return "Wala";
-  return "N/A";
+  return "N/D";
 }
 
 function localizeIsotopeStability(value) {
   const normalized = String(value ?? "").trim();
   if (!normalized) return "";
-
-  const lang = getLang();
-  const lower = normalized.toLowerCase();
-
-  if (/(radioactive|放射)/i.test(lower)) {
-    return t("elementModal.radioactive");
-  }
-  if (/(stable|穩定|稳定)/i.test(lower)) {
-    return t("elementModal.stable");
-  }
-
-  if (lang === "zh-Hant") {
-    return normalized
-      .replace(/稳定/g, "穩定")
-      .replace(/鲍林/g, "鮑林");
-  }
-
+  if (/radioactive/i.test(normalized)) return t("elementModal.radioactive");
+  if (/stable/i.test(normalized)) return t("elementModal.stable");
   return normalized;
-}
-
-function compactLocalizedHistoryText(text) {
-  const normalized = String(text ?? "").trim();
-  if (!normalized) return normalized;
-
-  const lang = getLang();
-  if (!lang.startsWith("zh")) return normalized;
-
-  return normalized
-    .replace(/\s*\(([A-Za-z][A-Za-z0-9 .,'’"“”:&/+-]*)\)\s*/g, "")
-    .replace(/\s{2,}/g, " ")
-    .trim();
 }
 
 function buildTextDetailMarkup(note) {
@@ -506,146 +248,36 @@ function buildIsotopeFallbackNote(element, isotope) {
   const abundance = abundanceMatch?.[1] || "";
   const isRadioactive = /radioactive|decay|t½|half-life/i.test(percentText);
   const isStable = /stable/i.test(percentText) && !isRadioactive;
-  const lang = getLang();
-  
-  if (lang.startsWith("zh")) {
-    if (lang === "zh-Hant") {
-      if (isStable && abundance) return `穩定同位素；自然豐度 ${abundance}。`;
-      if (isStable) return `${localizeElementName(element)} 的穩定同位素。`;
-      if (isRadioactive && /trace/i.test(percentText)) return "放射性同位素，自然界中僅存在痕量。";
-      if (isRadioactive && abundance) return `放射性同位素；自然豐度 ${abundance}。`;
-      if (isRadioactive) return `${localizeElementName(element)} 的放射性同位素。`;
-      return "暫無更多詳細資料。";
-    }
-    if (isStable && abundance) return `稳定同位素；自然丰度 ${abundance}。`;
-    if (isStable) return `${localizeElementName(element)} 的稳定同位素。`;
-    if (isRadioactive && /trace/i.test(percentText)) return "放射性同位素，自然界中仅存在痕量。";
-    if (isRadioactive && abundance) return `放射性同位素；自然丰度 ${abundance}。`;
-    if (isRadioactive) return `${localizeElementName(element)} 的放射性同位素。`;
-    return "暂无更多详细数据。";
-  }
-  if (lang.startsWith("ru")) {
-    if (isStable && abundance) return `Стабильный изотоп; природная распространенность ${abundance}.`;
-    if (isStable) return `Стабильный изотоп ${localizeElementName(element)}.`;
-    if (isRadioactive && /trace/i.test(percentText)) return "Радиоактивный изотоп, присутствует в природе в следовых количествах.";
-    if (isRadioactive && abundance) return `Радиоактивный изотоп; природная распространенность ${abundance}.`;
-    if (isRadioactive) return `Радиоактивный изотоп ${localizeElementName(element)}.`;
-    return localizeNoAdditionalData();
-  }
-  if (lang.startsWith("fr")) {
-    if (isStable && abundance) return `Isotope stable de ${localizeElementName(element)}; abondance naturelle ${abundance}.`;
-    if (isStable) return `Isotope stable de ${localizeElementName(element)}.`;
-    if (isRadioactive && /trace/i.test(percentText)) return "Isotope radioactif present seulement a l'etat de traces naturelles.";
-    if (isRadioactive && abundance) return `Isotope radioactif de ${localizeElementName(element)}; abondance naturelle ${abundance}.`;
-    if (isRadioactive) return `Isotope radioactif de ${localizeElementName(element)}.`;
-    return localizeNoAdditionalData();
-  }
-  if (lang.startsWith("fa")) {
-    if (isStable && abundance) return `ایزوتوپ پایدار ${localizeElementName(element)}؛ فراوانی طبیعی ${abundance}.`;
-    if (isStable) return `ایزوتوپ پایدار ${localizeElementName(element)}.`;
-    if (isRadioactive && /trace/i.test(percentText)) return "ایزوتوپ رادیواکتیو که در طبیعت فقط به مقدار ناچیز یافت می‌شود.";
-    if (isRadioactive && abundance) return `ایزوتوپ رادیواکتیو ${localizeElementName(element)}؛ فراوانی طبیعی ${abundance}.`;
-    if (isRadioactive) return `ایزوتوپ رادیواکتیو ${localizeElementName(element)}.`;
-    return localizeNoAdditionalData();
-  }
-  if (lang.startsWith("ur")) {
-    if (isStable && abundance) return `${localizeElementName(element)} کا مستحکم آئسوٹوپ؛ قدرتی فراوانی ${abundance}۔`;
-    if (isStable) return `${localizeElementName(element)} کا مستحکم آئسوٹوپ۔`;
-    if (isRadioactive && /trace/i.test(percentText)) return "تابکار آئسوٹوپ جو قدرتی طور پر صرف نہایت قلیل مقدار میں پایا جاتا ہے۔";
-    if (isRadioactive && abundance) return `${localizeElementName(element)} کا تابکار آئسوٹوپ؛ قدرتی فراوانی ${abundance}۔`;
-    if (isRadioactive) return `${localizeElementName(element)} کا تابکار آئسوٹوپ۔`;
-    return localizeNoAdditionalData();
-  }
-  if (lang.startsWith("tl")) {
-    if (isStable && abundance) return `Matatag na isotope ng ${localizeElementName(element)}; likas na kasaganaan ${abundance}.`;
-    if (isStable) return `Matatag na isotope ng ${localizeElementName(element)}.`;
-    if (isRadioactive && /trace/i.test(percentText)) return "Radyoaktibong isotope na matatagpuan lamang sa bakas na dami sa kalikasan.";
-    if (isRadioactive && abundance) return `Radyoaktibong isotope ng ${localizeElementName(element)}; likas na kasaganaan ${abundance}.`;
-    if (isRadioactive) return `Radyoaktibong isotope ng ${localizeElementName(element)}.`;
-    return localizeNoAdditionalData();
-  }
+  const name = localizeElementName(element).toLowerCase();
 
-  if (isStable && abundance) return `Stable isotope; natural abundance ${abundance}.`;
-  if (isStable) return `Stable isotope of ${element.name}.`;
-  if (isRadioactive && /trace/i.test(percentText)) return "Radioactive isotope present only in trace natural amounts.";
-  if (isRadioactive && abundance) return `Radioactive isotope; natural abundance ${abundance}.`;
-  if (isRadioactive) return `Radioactive isotope of ${element.name}.`;
+  if (isStable && abundance) return `Isótopo estable de ${name}; abundancia natural ${abundance}.`;
+  if (isStable) return `Isótopo estable de ${name}.`;
+  if (isRadioactive && /trace/i.test(percentText)) return "Isótopo radiactivo presente en la naturaleza solo en trazas.";
+  if (isRadioactive && abundance) return `Isótopo radiactivo de ${name}; abundancia natural ${abundance}.`;
+  if (isRadioactive) return `Isótopo radiactivo de ${name}.`;
   return localizeNoAdditionalData();
 }
 
-function localizeIsotopeNotes(text) {
+const SYNTHETIC_NOTE_RE = /^Synthetic element\. (\S+) \(([^)]+)\) is (the only confirmed isotope|among the longest-lived|the longest-lived)/;
+
+function localizeIsotopeNotes(element, text) {
   if (!text) return "";
-  const lang = getLang();
-  if (lang.startsWith("zh")) {
-    if (lang === "zh-Hant") {
-      return String(text)
-        .replace(/Synthetic element\.?\s*/gi, "人工合成元素。")
-        .replace(/is the longest-lived isotope amenable to study/gi, "是目前可研究的半衰期最長的同位素")
-        .replace(/is the longest-lived isotope/gi, "是目前已知半衰期最長的同位素")
-        .replace(/is the longest-lived known isotope/gi, "是已知半衰期最長的同位素")
-        .replace(/is the longest-lived confirmed isotope/gi, "是已確認的半衰期最長的同位素")
-        .replace(/is among the longest-lived/gi, "是半衰期較長的同位素之一")
-        .replace(/is a strong neutron source used industrially/gi, "是工業上使用的強中子源")
-        .replace(/is used in smoke detectors/gi, "被廣泛用於煙霧報警器")
-        .replace(/is the only confirmed isotope/gi, "是唯一已確認的同位素")
-        .replace(/Chemical studies confirmed/gi, "化學研究證實")
-        .replace(/Chemical experiments suggest/gi, "化學實驗表明")
-        .replace(/No chemical properties have been experimentally verified/gi, "其化學性質尚未通過實驗驗證")
-        .replace(/Predicted to be near the island of stability/gi, "預計接近穩定島")
-        .replace(/Relativistic effects predict/gi, "相對論效應預測")
-        .replace(/it may be a solid or a semiconductor rather than a noble gas/gi, "它可能是固體或半導體，而非稀有氣體")
-        .replace(/high volatility, possibly liquid or gaseous at STP/gi, "具有高揮發性，在標準狀態下可能為液態或氣態")
-        .replace(/volatile/gi, "揮發性")
-        .replace(/like osmium/gi, "與鋨類似")
-        .replace(/forms/gi, "形成")
-        .replace(/has t½/gi, "半衰期為");
-    }
-    return String(text)
-      .replace(/Synthetic element\.?\s*/gi, "人工合成元素。")
-      .replace(/is the longest-lived isotope amenable to study/gi, "是目前可研究的半衰期最长的同位素")
-      .replace(/is the longest-lived isotope/gi, "是目前已知半衰期最长的同位素")
-      .replace(/is the longest-lived known isotope/gi, "是已知半衰期最长的同位素")
-      .replace(/is the longest-lived confirmed isotope/gi, "是已确认的半衰期最长的同位素")
-      .replace(/is among the longest-lived/gi, "是半衰期较长的同位素之一")
-      .replace(/is a strong neutron source used industrially/gi, "是工业上使用的强中子源")
-      .replace(/is used in smoke detectors/gi, "被广泛用于烟雾报警器")
-      .replace(/is the only confirmed isotope/gi, "是唯一已确认的同位素")
-      .replace(/Chemical studies confirmed/gi, "化学研究证实")
-      .replace(/Chemical experiments suggest/gi, "化学实验表明")
-      .replace(/No chemical properties have been experimentally verified/gi, "其化学性质尚未通过实验验证")
-      .replace(/Predicted to be near the island of stability/gi, "预计接近稳定岛")
-      .replace(/Relativistic effects predict/gi, "相对论效应预测")
-      .replace(/it may be a solid or a semiconductor rather than a noble gas/gi, "它可能是固体或半导体，而非稀有气体")
-      .replace(/high volatility, possibly liquid or gaseous at STP/gi, "具有高挥发性，在标准状态下可能为液态或气态")
-      .replace(/volatile/gi, "挥发性")
-      .replace(/like osmium/gi, "与锇类似")
-      .replace(/forms/gi, "形成")
-      .replace(/has t½/gi, "半衰期为");
-  }
-  if (lang.startsWith("ru")) {
-    return String(text)
-      .replace(/Synthetic element\.?\s*/gi, "Синтетический элемент. ")
-      .replace(/is the longest-lived isotope/gi, "— наиболее долгоживущий изотоп")
-      .replace(/is the longest-lived known isotope/gi, "— наиболее долгоживущий известный изотоп")
-      .replace(/No chemical properties have been experimentally verified/gi, "Химические свойства экспериментально не подтверждены");
-  }
-  return text;
+  if (ISOTOPE_NOTES_ES[element.symbol]) return ISOTOPE_NOTES_ES[element.symbol];
+  const match = String(text).match(SYNTHETIC_NOTE_RE);
+  if (!match) return "";
+  const halfLife = match[2].replace(/ y$/, " años").replace(/(\d),(\d{3})/g, "$1.$2");
+  const claim = {
+    "the only confirmed isotope": "es el único isótopo confirmado",
+    "among the longest-lived": "está entre los más longevos",
+    "the longest-lived": "es el isótopo más longevo conocido",
+  }[match[3]];
+  return `Elemento sintético: ${match[1]} (${halfLife}) ${claim}.`;
 }
 
 function buildIsotopeDetailMarkup(element, isotope, isotopeNotes) {
-  const override = ISOTOPE_DETAIL_OVERRIDES[element.symbol]?.[isotope.name];
-  const lang = getLang();
-  let note = override || shortenDetailText(localizeIsotopeNotes(isotopeNotes), "") || buildIsotopeFallbackNote(element, isotope);
-  
-  if (lang.startsWith("zh")) {
-    const isotopeNotesByLang = lang === "zh-Hant" ? ISOTOPE_ZH_HANT : ISOTOPE_ZH;
-    if (isotopeNotesByLang[element.symbol]?.[isotope.name]) {
-      note = isotopeNotesByLang[element.symbol][isotope.name];
-    }
-  } else if (lang !== "en") {
-    note = buildIsotopeFallbackNote(element, isotope);
-  }
-  
+  const note = ISOTOPE_DETAIL_OVERRIDES[element.symbol]?.[isotope.name]
+    || shortenDetailText(localizeIsotopeNotes(element, isotopeNotes), "")
+    || buildIsotopeFallbackNote(element, isotope);
   return `<div class="ion-item-detail-inner"><p class="ion-detail-note">${escapeHtml(note)}</p></div>`;
 }
 
@@ -1000,8 +632,7 @@ function updatePeriodicTableLocalizedText(tableContainer) {
     if (nameEl) {
       const locName = localizeElementName(element);
       nameEl.textContent = locName;
-      const lang = document.documentElement.lang || "en";
-      if (locName.length <= 6 && !lang.startsWith("zh")) {
+      if (locName.length <= 6) {
         nameEl.classList.add("short-name");
       } else {
         nameEl.classList.remove("short-name");
@@ -2140,9 +1771,6 @@ function populateSimplifiedView(element) {
       namedBy = elementLocales[langCode][element.number].history.namedBy || namedBy;
     }
 
-    discoveredBy = compactLocalizedHistoryText(discoveredBy);
-    namedBy = compactLocalizedHistoryText(namedBy);
-
     setText("#el-modal-l4-discovered-by", discoveredBy);
     setText("#el-modal-l4-named-by", namedBy);
 
@@ -2296,12 +1924,7 @@ export function showModal(element) {
   }
   const headlineName = document.getElementById("headline-name");
   if (headlineName) {
-    const lang = getLang();
     let displayHeadline = localizeElementName(element);
-    const annotation = getElementAnnotation(element.number, lang);
-    if (annotation) {
-      displayHeadline = `${displayHeadline} ${annotation}`;
-    }
     headlineName.textContent = displayHeadline;
     const resizeFont = () => {
       const container = headlineName.parentElement;
@@ -2340,12 +1963,7 @@ export function showModal(element) {
   const elementText = document.querySelector(".element-text");
   const elementName = document.querySelector(".element-name");
   if (elementText && elementName) {
-    const lang = getLang();
     let displayHeadline = localizeElementName(element);
-    const annotation = getElementAnnotation(element.number, lang);
-    if (annotation) {
-      displayHeadline = `${displayHeadline} ${annotation}`;
-    }
     const nameLength = displayHeadline.length;
     let lengthCategory;
     if (nameLength <= 4) {
@@ -2762,7 +2380,7 @@ export function showModal(element) {
   }
   modal.classList.add("active");
   initElementTutorial();
-  document.title = `Zperiod - ${localizeElementName(element)}`;
+  document.title = `Periódica UCV - ${localizeElementName(element)}`;
   document.body.classList.add("hide-nav");
   if (isSimplifiedView) {
     const slider = document.querySelector(".cards-slider");
@@ -2800,6 +2418,7 @@ export function showModal(element) {
         }
         init3DScene(atomContainer);
         updateAtomStructure(element);
+        renderOrbitalControls(element);
         onWindowResize();
         reset3DView();
         animateAtom();
@@ -3026,7 +2645,7 @@ export function initModalUI() {
   function closeElementModal() {
     modal.classList.remove("active");
     document.body.classList.remove("hide-nav");
-    document.title = "Zperiod";
+    document.title = "Periódica UCV";
     clearHeadlineResizeHandler();
     cleanup3D(true);
     atomContainer.classList.remove("visible");

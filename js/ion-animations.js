@@ -297,7 +297,7 @@ const IonAnimations = {
         'h_plus': {
             slotA: 'ph',
             slotB: 'bubble',
-            configA: { start: '10%', end: '10%', label: 'Acidic' }
+            configA: { start: '10%', end: '10%', label: 'Ácido' }
         },
         'li_plus': {
             slotA: 'flame',
@@ -378,14 +378,14 @@ const IonAnimations = {
         'h3o_plus': {
             slotA: 'ph',
             slotB: 'water',
-            configA: { start: '10%', end: '10%', label: 'Acidic' }
+            configA: { start: '10%', end: '10%', label: 'Ácido' }
         },
 
         // === Anions ===
         'oh_minus': {
             slotA: 'ph',
             slotB: 'water',
-            configA: { start: '90%', end: '90%', label: 'Basic' }
+            configA: { start: '90%', end: '90%', label: 'Básico' }
         },
         'cl_minus': {
             slotA: 'precipitate',
@@ -420,7 +420,7 @@ const IonAnimations = {
         'o_2minus': {
             slotA: 'ph',
             slotB: 'flame',
-            configA: { start: '90%', end: '90%', label: 'Basic' },
+            configA: { start: '90%', end: '90%', label: 'Básico' },
             configB: { color: 'flame-blue' }
         },
         's_2minus': {
@@ -457,7 +457,7 @@ const IonAnimations = {
         'hco3_minus': {
             slotA: 'ph',
             slotB: 'bubble',
-            configA: { start: '50%', end: '50%', label: 'Buffer' }
+            configA: { start: '50%', end: '50%', label: 'Tampón' }
         },
         'po4_3minus': {
             slotA: 'precipitate',
@@ -467,7 +467,7 @@ const IonAnimations = {
         'ch3coo_minus': {
             slotA: 'ph',
             slotB: 'crystal',
-            configA: { start: '30%', end: '30%', label: 'Weak Acid' }
+            configA: { start: '30%', end: '30%', label: 'Ácido débil' }
         },
         'mno4_minus': {
             slotA: 'orb',
@@ -478,7 +478,7 @@ const IonAnimations = {
             slotA: 'orb',
             slotB: 'ph',
             configA: { color: 'orb-yellow' },
-            configB: { start: '50%', end: '50%', label: 'pH Shift' }
+            configB: { start: '50%', end: '50%', label: 'Cambio de pH' }
         },
         'cr2o7_2minus': {
             slotA: 'flame',
@@ -512,7 +512,7 @@ const IonAnimations = {
         'hso4_minus': {
             slotA: 'ph',
             slotB: 'dissolve',
-            configA: { start: '20%', end: '20%', label: 'Acidic' }
+            configA: { start: '20%', end: '20%', label: 'Ácido' }
         },
         'h2po4_minus': {
             slotA: 'plant',
@@ -521,7 +521,7 @@ const IonAnimations = {
         'hpo4_2minus': {
             slotA: 'bone',
             slotB: 'ph',
-            configB: { start: '60%', end: '60%', label: 'Buffer' }
+            configB: { start: '60%', end: '60%', label: 'Tampón' }
         },
         's2o3_2minus': {
             slotA: 'sun',

@@ -3617,3 +3617,152 @@ body.tutorial-active .level-lock-btn {
   pointer-events: auto !important;
   z-index: 9999 !important;
 }
+
+/* ===== 3D orbital view controls (element modal) ===== */
+.orbital-controls {
+  position: absolute;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  z-index: 20;
+  width: min(92%, 440px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.orbital-controls > * {
+  pointer-events: auto;
+}
+
+.orbital-mode-switch {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--modal-bg-glass);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(12px);
+}
+
+.orbital-mode-switch button {
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  font: 600 0.85rem "Inter", sans-serif;
+  padding: 7px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.orbital-mode-switch button[aria-checked="true"] {
+  background: var(--modal-text-main);
+  color: #fff;
+}
+
+.orbital-mode-switch button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.orbital-mode-switch button:focus-visible,
+.orbital-chip:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.orbital-panel {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--modal-bg-glass);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.orbital-panel[hidden] {
+  display: none;
+}
+
+.orbital-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 0.75rem;
+  color: var(--modal-text-sub);
+}
+
+.orbital-panel-title {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.orbital-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.orbital-phase {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-left: 6px;
+}
+
+.orbital-phase-plus { background: #2563eb; }
+.orbital-phase-minus { background: #f97316; }
+
+.orbital-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 96px;
+  overflow-y: auto;
+}
+
+.orbital-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  min-height: 32px;
+  padding: 5px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: #fff;
+  color: var(--modal-text-main);
+  font: 600 0.82rem "Inter", sans-serif;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.orbital-chip:hover {
+  border-color: rgba(37, 99, 235, 0.4);
+}
+
+.orbital-chip.active {
+  background: rgba(37, 99, 235, 0.1);
+  border-color: #2563eb;
+  color: #1d4ed8;
+}
+
+.orbital-spin {
+  font-size: 0.78rem;
+  color: var(--modal-text-sub);
+  letter-spacing: -1px;
+}
+
+.orbital-hint {
+  margin: 8px 0 0;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: var(--modal-text-sub);
+}

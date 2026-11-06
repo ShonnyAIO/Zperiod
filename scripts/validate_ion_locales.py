@@ -11,13 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 LOCALES_DIR = ROOT / "js" / "data" / "locales" / "ions"
 
 LOCALES = {
-    "zh": ("zh.js", "zh_ions"),
-    "zh-Hant": ("zhHant.js", "zh_hant_ions"),
-    "fr": ("fr.js", "fr_ions"),
-    "ru": ("ru.js", "ru_ions"),
-    "fa": ("fa.js", "fa_ions"),
-    "ur": ("ur.js", "ur_ions"),
-    "tl": ("tl.js", "tl_ions"),
+    "es": ("es.js", "es_ions"),
 }
 
 

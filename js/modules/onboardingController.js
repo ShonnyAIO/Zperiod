@@ -1,5 +1,5 @@
 
-import { t, setLang } from "./langController.js";
+import { t } from "./langController.js";
 
 /**
  * Enhanced Onboarding Flow for Zperiod 2.0
@@ -122,98 +122,20 @@ export function initOnboardingFlow() {
         box-shadow: 0 8px 20px rgba(0,0,0,0.15);
       }
 
-      /* Language Selection Screen */
-      .lang-selection {
-        display: none;
-        flex-direction: column;
-        align-items: center;
-        gap: 32px;
-        width: 100%;
-        max-width: 900px;
-        padding: 40px;
-        z-index: 20;
-      }
-
-      .lang-selection.visible {
-        display: flex;
-        animation: fadeIn 0.5s ease forwards;
-      }
-
-      .lang-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-        width: 100%;
-      }
-
-      .lang-btn {
-        position: relative;
-        padding: 24px;
-        background: #ffffff;
-        border: 1px solid rgba(0,0,0,0.06);
-        border-radius: 20px;
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: #1e293b;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-        text-align: center;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-      }
-
-      .lang-btn::after {
-        content: '→';
-        position: absolute;
-        right: 20px;
-        opacity: 0;
-        transform: translateX(-10px);
-        transition: all 0.3s ease;
-      }
-
-      .lang-btn:hover {
-        border-color: #1e293b;
-        transform: translateY(-4px) scale(1.02);
-        box-shadow: 0 12px 24px rgba(0,0,0,0.06);
-        background: #fafafa;
-      }
-
-      .lang-btn:hover::after {
-        opacity: 1;
-        transform: translateX(0);
-      }
-
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
     </style>
     <div class="danmaku-container" id="danmaku-field"></div>
     
     <div id="animation-stage" style="display:flex; flex-direction:column; align-items:center;">
         <div class="logo-container" id="onboarding-logo">
           <img src="logo.svg" class="logo-z" alt="Z">
-          <span class="logo-text">Zperiod</span>
+          <span class="logo-text">Periódica UCV</span>
         </div>
         
         <div class="start-btn-container" id="start-btn-box">
-          <button class="onboarding-btn" id="onboarding-start-btn">Start</button>
+          <button class="onboarding-btn" id="onboarding-start-btn">${t("onboarding.start")}</button>
         </div>
     </div>
 
-    <div class="lang-selection" id="lang-select-screen">
-      <h2 style="font-size: 2.5rem; color: #1e293b; margin-bottom: 0px; font-weight: 800; letter-spacing: -1px;">Select Language</h2>
-      <p style="color: #64748b; margin-bottom: 20px; font-size: 1.1rem;">Choose your preferred language to continue</p>
-      <div class="lang-grid">
-        <button class="lang-btn" data-lang="en">English</button>
-        <button class="lang-btn" data-lang="zh">简体中文</button>
-        <button class="lang-btn" data-lang="zh-Hant">繁體中文</button>
-        <button class="lang-btn" data-lang="fr">Français</button>
-        <button class="lang-btn" data-lang="ru">Русский</button>
-        <button class="lang-btn" data-lang="fa">فارسی</button>
-        <button class="lang-btn" data-lang="ur">اردو</button>
-        <button class="lang-btn" data-lang="tl">Tagalog</button>
-      </div>
-    </div>
   `;
   document.body.appendChild(overlay);
 
@@ -222,7 +144,6 @@ export function initOnboardingFlow() {
   const startBtnBox = document.getElementById("start-btn-box");
   const startBtn = document.getElementById("onboarding-start-btn");
   const stage = document.getElementById("animation-stage");
-  const langScreen = document.getElementById("lang-select-screen");
 
   // Step 1: Initial Delay then Expand Logo
   setTimeout(() => {
@@ -237,15 +158,11 @@ export function initOnboardingFlow() {
   }, 1600);
 
   function startDanmaku() {
-    const supportedLangs = ["en", "zh", "zh-Hant", "fr", "ru", "fa", "ur", "tl"];
-    const allPhrases = [];
-    supportedLangs.forEach(l => {
-        const phrases = t(`onboarding.phrases`, [], l);
-        if (Array.isArray(phrases)) allPhrases.push(...phrases);
-    });
+    const phrases = t("onboarding.phrases", []);
+    const allPhrases = Array.isArray(phrases) ? [...phrases] : [];
 
     if (allPhrases.length === 0) {
-        allPhrases.push("Zperiod", "Chemistry", "Atom", "Molecule");
+        allPhrases.push("Periódica UCV", "Chemistry", "Atom", "Molecule");
     }
 
     const createItem = () => {
@@ -280,17 +197,9 @@ export function initOnboardingFlow() {
     
     setTimeout(() => {
         stage.style.display = "none";
-        langScreen.classList.add("visible");
     }, 500);
-  });
 
-  langScreen.addEventListener("click", (e) => {
-    const btn = e.target.closest(".lang-btn");
-    if (!btn) return;
-    const lang = btn.dataset.lang;
-    
     localStorage.setItem("zperiod_welcomed_v2", "true");
-    sessionStorage.setItem("zperiod_lang_transition", "true");
     
     // Smooth seamless transition: Create a temporary white overlay to hide the reload flash
     const transitionOverlay = document.createElement("div");
@@ -307,7 +216,6 @@ export function initOnboardingFlow() {
     requestAnimationFrame(() => {
       transitionOverlay.style.opacity = "1";
       setTimeout(() => {
-        localStorage.setItem("zperiod_lang", lang);
         window.location.reload();
       }, 450);
     });

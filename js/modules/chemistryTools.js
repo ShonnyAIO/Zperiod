@@ -644,9 +644,9 @@ export function balanceEquationModal(equation) {
     if (/^\d+$/.test(tk)) {
       if (/^0/.test(tk)) {
         const suggestion = tk.replace(/^0/, "O");
-        throw new Error(`<span><strong>${ct("balancer.checkFormatTitle", "Check the equation format")}:</strong> Did you type 0 (zero) instead of O (oxygen)? Try "<code>${suggestion}</code>"</span>`);
+        throw new Error(`<span><strong>${ct("balancer.checkFormatTitle", "Check the equation format")}:</strong> ¿Escribiste 0 (cero) en vez de O (oxígeno)? Prueba «<code>${suggestion}</code>»</span>`);
       } else {
-        throw new Error(`<span><strong>${ct("balancer.checkFormulaFormatTitle", "Check the formula formatting")}:</strong> "${tk}" is not a valid compound formula.</span>`);
+        throw new Error(`<span><strong>${ct("balancer.checkFormulaFormatTitle", "Check the formula formatting")}:</strong> «${tk}» no es una fórmula de compuesto válida.</span>`);
       }
     }
   }
@@ -727,7 +727,7 @@ export function balanceEquationModal(equation) {
       const atomCounts = parseFormulaStrict(f);
       demoChemistryValidator(f, atomCounts);
     } catch(e) {
-      if (!e.message.includes("mean <code>") && !e.message.includes("你想写") && !e.message.includes("移除") && !e.message.includes("Remove") && !e.message.includes("Invalid hydrate") && !e.message.includes("looks unusual") && !e.message.includes("异常") && !e.message.includes("<span")) {
+      if (!e.message.includes("decir <code>") && !e.message.includes("Quita") && !e.message.includes("hidrato no válida") && !e.message.includes("inusual") && !e.message.includes("<span")) {
          throw new Error(`<span><strong>${specificTitle}:</strong> ${e.message}</span>`);
       }
       throw e; 
@@ -814,10 +814,10 @@ export function generateAtomCheckModal(equation) {
   const leftAtoms = countAtomsModal(left);
   const rightAtoms = countAtomsModal(right);
 
-  let html = "<h4>Atom Count Check:</h4>";
+  let html = "<h4>Conteo de átomos:</h4>";
   html += '<table class="check-table">';
   html +=
-    "<tr><th>Element</th><th>Left Side</th><th>Right Side</th><th>Match</th></tr>";
+    "<tr><th>Elemento</th><th>Lado izquierdo</th><th>Lado derecho</th><th>Coincide</th></tr>";
 
   const allElements = new Set([
     ...Object.keys(leftAtoms),
@@ -837,7 +837,7 @@ export function generateAtomCheckModal(equation) {
 
   html += "</table>";
   html += `<div class="balance-status ${allMatch ? "balanced" : "unbalanced"}">
-        <strong>Conservation of matter:</strong> ${allMatch ? "✓ Balanced!" : "✗ Not balanced"}
+        <strong>Conservación de la materia:</strong> ${allMatch ? "✓ ¡Balanceada!" : "✗ Sin balancear"}
     </div>`;
 
   return html;
@@ -1295,27 +1295,27 @@ export function calculateEmpiricalModal(data) {
   });
 
   // ===== Build detailed explanation =====
-  let explanation = "<h4>Calculation Steps</h4><ol>";
-  explanation += "<li><strong>Assume 100 g sample</strong> — each % becomes grams directly.</li>";
+  let explanation = "<h4>Pasos del cálculo</h4><ol>";
+  explanation += "<li><strong>Supón una muestra de 100 g</strong>: cada % pasa a ser gramos directamente.</li>";
   if (normalised) {
-    explanation += `<li><strong>Note:</strong> Percentages summed to ${rawSum.toFixed(1)}%; values normalised to 100%.</li>`;
+    explanation += `<li><strong>Nota:</strong> los porcentajes suman ${rawSum.toFixed(1)} %; los valores se normalizaron a 100 %.</li>`;
   }
-  explanation += "<li><strong>Convert grams → moles</strong> (g ÷ atomic mass):</li><ul>";
+  explanation += "<li><strong>Convierte gramos → moles</strong> (g ÷ masa atómica):</li><ul>";
   moles.forEach(m => {
     explanation += `<li>${m.symbol}: ${m.grams.toFixed(2)} g ÷ ${m.atomicWeight} g/mol = <strong>${m.moles.toFixed(4)} mol</strong></li>`;
   });
   explanation += "</ul>";
-  explanation += `<li><strong>Divide all by smallest</strong> (${minMoles.toFixed(4)} mol):</li><ul>`;
+  explanation += `<li><strong>Divide todo entre el menor</strong> (${minMoles.toFixed(4)} mol):</li><ul>`;
   ratios.forEach(r => {
     explanation += `<li>${r.symbol}: ${r.moles.toFixed(4)} ÷ ${minMoles.toFixed(4)} = <strong>${r.ratio.toFixed(3)}</strong></li>`;
   });
   explanation += "</ul>";
-  explanation += "<li><strong>Round to whole-number ratio:</strong></li><ul>";
+  explanation += "<li><strong>Redondea a una razón de números enteros:</strong></li><ul>";
   ordered.forEach(r => {
     explanation += `<li>${r.symbol} → <strong>${r.count}</strong></li>`;
   });
   explanation += "</ul>";
-  explanation += `<li><strong>Empirical formula:</strong> <strong>${empiricalFormula}</strong> (${empiricalMass.toFixed(2)} g/mol)</li>`;
+  explanation += `<li><strong>Fórmula empírica:</strong> <strong>${empiricalFormula}</strong> (${empiricalMass.toFixed(2)} g/mol)</li>`;
   explanation += "</ol>";
 
   // ===== Molecular formula (only if molar mass provided) =====
@@ -1329,17 +1329,17 @@ export function calculateEmpiricalModal(data) {
     const n = Math.round(rawN);
 
     if (n < 1 || Math.abs(rawN - n) > 0.1) {
-      molMassError = `Molar mass ${mm} g/mol does not match empirical formula mass ${empiricalMass.toFixed(2)} g/mol (ratio = ${rawN.toFixed(2)}, not close to an integer).`;
+      molMassError = `La masa molar ${mm} g/mol no coincide con la masa de la fórmula empírica ${empiricalMass.toFixed(2)} g/mol (razón = ${rawN.toFixed(2)}, lejos de un entero).`;
     } else {
       multiplier = n;
       molecularFormula = ordered
         .map(r => r.symbol + (r.count * n > 1 ? subscript(r.count * n) : ''))
         .join('');
 
-      explanation += "<hr><h4>Molecular Formula</h4>";
-      explanation += `<p>Given molar mass: <strong>${mm} g/mol</strong></p>`;
+      explanation += "<hr><h4>Fórmula molecular</h4>";
+      explanation += `<p>Masa molar dada: <strong>${mm} g/mol</strong></p>`;
       explanation += `<p>n = ${mm} ÷ ${empiricalMass.toFixed(2)} = <strong>${rawN.toFixed(2)} ≈ ${n}</strong></p>`;
-      explanation += `<p>Molecular formula = empirical × ${n} = <strong>${molecularFormula}</strong></p>`;
+      explanation += `<p>Fórmula molecular = empírica × ${n} = <strong>${molecularFormula}</strong></p>`;
     }
   }
 

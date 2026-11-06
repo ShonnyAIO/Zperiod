@@ -41,9 +41,7 @@ function normalizeSearchText(value) {
 }
 
 function getLocalizedElementName(element) {
-  const lang = getLang();
-  if (lang === "en") return element.name;
-  return elementLocales[lang]?.[element.number]?.name || element.name;
+  return elementLocales[getLang()]?.[element.number]?.name || element.name;
 }
 
 export function initElementSearch({ showPage, updateGlobalNavActive } = {}) {

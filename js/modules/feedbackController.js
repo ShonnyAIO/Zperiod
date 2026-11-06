@@ -1,14 +1,14 @@
-const FEEDBACK_WEBHOOK_URL =
-  "https://discord.com/api/webhooks/1470782870527414455/0c9YPJ-nWeAQ3FDyO7xou9TivkdrPWGmtISAS4MRyY9RKldhtsqekHfbPuhuYIMyVduU";
+// The upstream webhook posted to the original author's Discord; set your own to re-enable suggestions.
+export const FEEDBACK_WEBHOOK_URL = "";
 
 export const SUCCESS_ICON_SVG =
   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
 
 export async function submitSuggestion(text, options = {}) {
   const trimmed = text?.trim();
-  if (!trimmed) return false;
+  if (!trimmed || !FEEDBACK_WEBHOOK_URL) return false;
 
-  const { source = "Zperiod" } = options;
+  const { source = "Periódica UCV" } = options;
   const sourceLabel = source ? ` from ${source}` : "";
 
   try {

@@ -21,12 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT_DIR = ROOT / "js" / "data" / "locales" / "ions"
 
 LANG_CONFIG = {
-    "zh": {"module": "zh.js", "export": "zh_ions", "target": "zh-CN"},
-    "fr": {"module": "fr.js", "export": "fr_ions", "target": "fr"},
-    "ru": {"module": "ru.js", "export": "ru_ions", "target": "ru"},
-    "fa": {"module": "fa.js", "export": "fa_ions", "target": "fa"},
-    "ur": {"module": "ur.js", "export": "ur_ions", "target": "ur"},
-    "tl": {"module": "tl.js", "export": "tl_ions", "target": "tl"},
+    "es": {"module": "es.js", "export": "es_ions", "target": "es"},
 }
 
 ZH_NAME_OVERRIDES = {
@@ -208,13 +203,7 @@ def load_element_names_by_symbol(lang_code: str, rows: list[dict[str, str]]) -> 
         return {row["symbol"]: row["name"] for row in rows}
 
     locale_map = {
-        "zh": ("js/data/locales/zh.js", "zh_elements"),
-        "zh-Hant": ("js/data/locales/zhHant.js", "zh_hant_elements"),
-        "fr": ("js/data/locales/fr.js", "fr_elements"),
-        "ru": ("js/data/locales/ru.js", "ru_elements"),
-        "fa": ("js/data/locales/fa.js", "fa_elements"),
-        "ur": ("js/data/locales/ur.js", "ur_elements"),
-        "tl": ("js/data/locales/tl.js", "tl_elements"),
+        "es": ("js/data/locales/es.js", "es_elements"),
     }
     filename, export_name = locale_map[lang_code]
     payload = load_json_module(ROOT / filename, export_name)
@@ -302,9 +291,21 @@ def batch_translate(texts: list[str], translator: GoogleTranslator, *, protect_n
     return results
 
 
+# namedBy keeps protected English etymology words, so they are localized here.
+ES_REPLACEMENTS = {
+    "Greek ": "Griego ", "Latin ": "Latín ", "German ": "Alemán ", "Sanskrit ": "Sánscrito ",
+    "From Temple": "Del templo", "From Phosphate": "Del fosfato", "From Sulfuric Acid": "Del ácido sulfúrico",
+    "Prefix Bi- (Double Carbonate)": "Prefijo bi- (doble carbonato)",
+    "(Pale Green)": "(verde pálido)", "(Dark Blue)": "(azul oscuro)", "(Egyptian Soda)": "(soda egipcia)",
+}
+
+
 def normalize_text(lang_code: str, text: str) -> str:
     if text is None:
         return ""
+    if lang_code == "es":
+        for source, target in ES_REPLACEMENTS.items():
+            text = text.replace(source, target)
     normalized = text.replace(" ; ", "; ").replace(" , ", ", ")
     normalized = normalized.replace("（ ", "（").replace(" ）", "）")
     normalized = re.sub(r"\s{2,}", " ", normalized).strip()
@@ -596,7 +597,7 @@ def parse_args() -> argparse.Namespace:
         "--langs",
         nargs="+",
         choices=sorted(list(LANG_CONFIG.keys()) + ["zh-Hant"]),
-        default=["zh", "zh-Hant", "fr", "ru", "fa", "ur", "tl"],
+        default=["es"],
     )
     return parser.parse_args()
 

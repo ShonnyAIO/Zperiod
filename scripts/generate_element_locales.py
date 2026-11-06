@@ -19,11 +19,7 @@ EN_SOURCE_PATH = ROOT / "en_source.json"
 OUT_DIR = ROOT / "js" / "data" / "locales"
 
 LANG_CONFIG = {
-    "fr": {"module": "fr.js", "export": "fr_elements", "target": "fr"},
-    "ru": {"module": "ru.js", "export": "ru_elements", "target": "ru"},
-    "fa": {"module": "fa.js", "export": "fa_elements", "target": "fa"},
-    "ur": {"module": "ur.js", "export": "ur_elements", "target": "ur"},
-    "tl": {"module": "tl.js", "export": "tl_elements", "target": "tl"},
+    "es": {"module": "es.js", "export": "es_elements", "target": "es"},
 }
 
 
@@ -102,6 +98,11 @@ NAME_ORIGIN_MARKERS = (
 )
 
 DISCOVERY_YEAR_TERMS = {
+    "es": {
+        "prehistory": "Prehistoria",
+        "bce": "a. C.",
+        "ce": "d. C.",
+    },
     "fr": {
         "prehistory": "Préhistoire",
         "bce": "av. J.-C.",
@@ -130,6 +131,24 @@ DISCOVERY_YEAR_TERMS = {
 }
 
 STRING_REPLACEMENTS = {
+    # discoveredBy keeps the English source, so its non-name words are localized here.
+    "es": {
+        "Ancient Civilizations (Iron Age)": "Civilizaciones antiguas (Edad del Hierro)",
+        "Ancient Civilizations (Bronze Age)": "Civilizaciones antiguas (Edad del Bronce)",
+        "Ancient Civilizations": "Civilizaciones antiguas",
+        "Ancient Egyptians/Chinese": "Antiguos egipcios/chinos",
+        "Alchemists (confused with Pb/Sn)": "Alquimistas (confundido con Pb/Sn)",
+        "Indian metallurgists": "Metalúrgicos indios",
+        "(attributed)": "(atribuido)",
+        "(and Davy)": "(y Davy)",
+        "(Id.)": "(identificado)",
+        "(Iso.)": "(aislado)",
+        "GSI Helmholtz Centre": "Centro GSI Helmholtz",
+        "(Russia)": "(Rusia)",
+        "(Germany)": "(Alemania)",
+        "(Japan)": "(Japón)",
+        "(USA)": "(EE. UU.)",
+    },
     "fr": {
         "WWI": "Première Guerre mondiale",
         "LEDs": "DEL",

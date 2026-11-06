@@ -4,6 +4,8 @@
 // reusable Vector3 pool, for-loop hot paths, capped DPR
 // =============================================================================
 
+import { sampleOrbital, radialQuantile } from "./orbitalMath.js";
+
 // ===== Module-level state =====
 let scene, camera, renderer, atomGroup, animationId;
 let electrons = [];
@@ -34,6 +36,14 @@ let _v3 = null;
 // Direct references to avoid getObjectByName() every frame
 let _nucleusGroupRef = null;
 let _wobbleGroupRef = null;
+
+// ===== Orbital view state =====
+let orbitalGroup = null;
+let shellsMaxRadius = 4.5;
+let orbitalDotTexture = null;
+const ORBITAL_RADIUS = 8; // display radius of the largest shown orbital cloud
+const PHASE_COLORS = { plus: 0x2563eb, minus: 0xf97316 };
+const ORBITAL_OPACITY = 0.6;
 
 // ===== Quality profile (segment counts only — trails are always 10) =====
 function getQualityProfile(atomicNumber) {
@@ -187,7 +197,7 @@ export function init3DScene(container) {
         msg.style.cssText =
           "color:#333;display:flex;justify-content:center;align-items:center;height:100%;flex-direction:column;text-align:center;padding:20px;";
         msg.innerHTML =
-          '<div style="font-size:1.2rem;margin-bottom:10px;">3D View Unavailable</div><div style="font-size:0.8rem;opacity:0.7;">请在Chrome地址栏输入 chrome://settings/system<br>确保"使用硬件加速"已开启，然后刷新页面</div>';
+          '<div style="font-size:1.2rem;margin-bottom:10px;">Vista 3D no disponible</div><div style="font-size:0.8rem;opacity:0.7;">Escribe chrome://settings/system en la barra de direcciones de Chrome,<br>activa «Usar aceleración por hardware» y recarga la página.</div>';
         _container.appendChild(msg);
         return;
       }
@@ -273,6 +283,7 @@ export function init3DScene(container) {
 // ===== Atom Structure Builder =====
 export function updateAtomStructure(element) {
   if (!atomGroup) return;
+  disposeOrbitalGroup();
   while (atomGroup.children.length > 0) {
     atomGroup.remove(atomGroup.children[0]);
   }
@@ -531,6 +542,7 @@ export function updateAtomStructure(element) {
     actualMaxRadius = 4.5 + (shellsUsed - 1) * 2.5;
   }
   
+  shellsMaxRadius = actualMaxRadius;
   atomGroup.userData.maxRadius = actualMaxRadius;
   atomGroup.userData.popStartTime = Date.now();
   atomGroup.scale.set(0.1, 0.1, 0.1);
@@ -541,6 +553,107 @@ export function updateAtomStructure(element) {
   
   const eduOverlay = document.getElementById("na-edu-overlay");
   if (eduOverlay) eduOverlay.style.display = "none";
+}
+
+// ===== Orbital View =====
+// Soft round sprite so cloud points read as density, not squares.
+function getOrbitalDotTexture() {
+  if (orbitalDotTexture) return orbitalDotTexture;
+  const size = 32;
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  const grad = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  grad.addColorStop(0, "rgba(255,255,255,1)");
+  grad.addColorStop(0.5, "rgba(255,255,255,0.6)");
+  grad.addColorStop(1, "rgba(255,255,255,0)");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, size, size);
+  orbitalDotTexture = new THREE.CanvasTexture(canvas);
+  return orbitalDotTexture;
+}
+
+function disposeOrbitalGroup() {
+  if (!orbitalGroup) return;
+  for (const points of orbitalGroup.children) {
+    points.geometry.dispose();
+    points.material.dispose();
+  }
+  if (orbitalGroup.parent) orbitalGroup.parent.remove(orbitalGroup);
+  orbitalGroup = null;
+}
+
+/**
+ * Shows valence orbitals as |ψ|² point clouds coloured by phase, or returns to
+ * the shell (Bohr) view when `orbitals` is null. Orbitals come from
+ * orbitalMath.valenceOrbitals().
+ */
+export function setOrbitalView(orbitals) {
+  if (!atomGroup) return;
+  const hadOrbitals = Boolean(orbitalGroup);
+  disposeOrbitalGroup();
+  const showOrbitals = Array.isArray(orbitals) && orbitals.length > 0;
+  if (_wobbleGroupRef) _wobbleGroupRef.visible = !showOrbitals;
+  // Lift the cloud so the orbital panel at the bottom of the pane doesn't cover it.
+  atomGroup.position.y = showOrbitals ? 2.5 : 0;
+  if (_nucleusGroupRef) {
+    const s = showOrbitals ? 0.3 : 1;
+    _nucleusGroupRef.scale.set(s, s, s);
+  }
+  if (!showOrbitals) {
+    atomGroup.userData.maxRadius = shellsMaxRadius;
+    if (hadOrbitals) reset3DView();
+    return;
+  }
+
+  const largest = Math.max(...orbitals.map((o) => radialQuantile(o.n, o.l, 0.95)));
+  const scale = ORBITAL_RADIUS / largest;
+  const plus = new THREE.Color(PHASE_COLORS.plus);
+  const minus = new THREE.Color(PHASE_COLORS.minus);
+  const texture = getOrbitalDotTexture();
+
+  orbitalGroup = new THREE.Group();
+  for (const orbital of orbitals) {
+    // Paired orbitals get denser clouds than singly occupied ones.
+    const count = (orbital.l === 0 ? 1800 : 2600) * (orbital.electrons === 2 ? 1 : 0.65);
+    const { positions, signs } = sampleOrbital(orbital.n, orbital.l, orbital.m, Math.round(count));
+    const colors = new Float32Array(positions.length);
+    for (let i = 0; i < signs.length; i++) {
+      const c = signs[i] > 0 ? plus : minus;
+      positions[i * 3] *= scale;
+      positions[i * 3 + 1] *= scale;
+      positions[i * 3 + 2] *= scale;
+      colors[i * 3] = c.r;
+      colors[i * 3 + 1] = c.g;
+      colors[i * 3 + 2] = c.b;
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+    const material = new THREE.PointsMaterial({
+      size: 0.32,
+      map: texture,
+      vertexColors: true,
+      transparent: true,
+      opacity: ORBITAL_OPACITY,
+      depthWrite: false,
+      sizeAttenuation: true,
+    });
+    const points = new THREE.Points(geometry, material);
+    points.userData.key = orbital.key;
+    orbitalGroup.add(points);
+  }
+  atomGroup.add(orbitalGroup);
+  atomGroup.userData.maxRadius = ORBITAL_RADIUS;
+  reset3DView();
+}
+
+/** Isolates one orbital cloud by key (others fade out); null shows all. */
+export function focusOrbital(key) {
+  if (!orbitalGroup) return;
+  for (const points of orbitalGroup.children) {
+    points.material.opacity = !key || points.userData.key === key ? ORBITAL_OPACITY : 0.04;
+  }
 }
 
 // ===== Window Resize Handler =====
@@ -582,7 +695,7 @@ export function animateAtom() {
   if (!atomGroup) return;
 
   // --- Orbit hover (raycaster) ---
-  if (orbitHitTargets.length > 0) {
+  if (orbitHitTargets.length > 0 && !orbitalGroup) {
     raycaster.setFromCamera(mouse, camera);
     try {
       const intersects = raycaster.intersectObjects(orbitHitTargets, false);
@@ -756,6 +869,7 @@ export function cleanup3D(full) {
     scene = null;
     camera = null;
     atomGroup = null;
+    orbitalGroup = null;
     electrons = [];
     orbitHitTargets = [];
     _nucleusGroupRef = null;
@@ -765,6 +879,7 @@ export function cleanup3D(full) {
 
 // ===== Helper: Clear current atom =====
 export function clearCurrentAtom() {
+  disposeOrbitalGroup();
   if (atomGroup) {
     while (atomGroup.children.length > 0) {
       atomGroup.remove(atomGroup.children[0]);

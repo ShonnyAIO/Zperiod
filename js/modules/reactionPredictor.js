@@ -524,7 +524,7 @@ const NONMETAL_OXIDE_TO_ACID = {
  */
 function predictSynthesis(reactants) {
   if (reactants.length < 2) {
-    return { error: "Synthesis requires at least two reactants." };
+    return { error: "La síntesis requiere al menos dos reactivos." };
   }
 
   const classified = reactants.map(classifyCompound);
@@ -562,7 +562,7 @@ function predictSynthesis(reactants) {
       );
       return {
         products: [product],
-        explanation: `Metal oxide (${metalOxide.formula}) + water → metal hydroxide.`,
+        explanation: `Óxido metálico (${metalOxide.formula}) + agua → hidróxido metálico.`,
       };
     }
 
@@ -573,10 +573,10 @@ function predictSynthesis(reactants) {
       if (acidFormula) {
         return {
           products: [acidFormula],
-          explanation: `Nonmetal oxide (${nmOxide.formula}) + water → oxyacid.`,
+          explanation: `Óxido no metálico (${nmOxide.formula}) + agua → oxoácido.`,
         };
       }
-      return { error: `Unsupported nonmetal oxide synthesis: ${nmOxide.formula} + H₂O.` };
+      return { error: `Síntesis de óxido no metálico no soportada: ${nmOxide.formula} + H₂O.` };
     }
 
     // Pattern 4: Nonmetal + Nonmetal Synthesis (Specific common cases)
@@ -606,13 +606,13 @@ function predictSynthesis(reactants) {
         const otherNm = sym1 === "O" ? sym2 : sym1;
         const oxideMap = { "C": "CO2", "S": "SO2", "P": "P2O5", "N": "NO2" };
         if (oxideMap[otherNm]) {
-          return { products: [oxideMap[otherNm]], explanation: ct("predictor.reasonSynthesisOxide", `${otherNm} synthesizes with oxygen to form ${oxideMap[otherNm]}`) || "Nonmetal synthesizes with oxygen to form a nonmetal oxide." };
+          return { products: [oxideMap[otherNm]], explanation: ct("predictor.reasonSynthesisOxide", `${otherNm} synthesizes with oxygen to form ${oxideMap[otherNm]}`, { nonmetal: otherNm, oxide: oxideMap[otherNm] }) || "Nonmetal synthesizes with oxygen to form a nonmetal oxide." };
         }
       }
     }
   }
 
-  return { error: "These reactants do not match a supported synthesis pattern." };
+  return { error: "Estos reactivos no corresponden a ningún patrón de síntesis soportado." };
 }
 
 /**
@@ -621,7 +621,7 @@ function predictSynthesis(reactants) {
  */
 function predictDecomposition(reactants) {
   if (reactants.length !== 1) {
-    return { error: "Decomposition requires exactly one reactant." };
+    return { error: "La descomposición requiere exactamente un reactivo." };
   }
 
   const c = classifyCompound(reactants[0]);
@@ -630,7 +630,7 @@ function predictDecomposition(reactants) {
   if (c.type === "water") {
     return {
       products: ["H2", "O2"],
-      explanation: "Water decomposes into hydrogen gas and oxygen gas.",
+      explanation: "El agua se descompone en hidrógeno gaseoso y oxígeno gaseoso.",
     };
   }
 
@@ -643,7 +643,7 @@ function predictDecomposition(reactants) {
     );
     return {
       products: [oxide, "CO2"],
-      explanation: `Metal carbonate (${c.formula}) decomposes into a metal oxide and carbon dioxide.`,
+      explanation: `El carbonato metálico (${c.formula}) se descompone en un óxido metálico y dióxido de carbono.`,
     };
   }
 
@@ -656,7 +656,7 @@ function predictDecomposition(reactants) {
     );
     return {
       products: [carbonate, "H2O", "CO2"],
-      explanation: `Metal hydrogen carbonate (${c.formula}) decomposes into a metal carbonate, water, and carbon dioxide.`,
+      explanation: `El bicarbonato metálico (${c.formula}) se descompone en un carbonato metálico, agua y dióxido de carbono.`,
     };
   }
 
@@ -669,7 +669,7 @@ function predictDecomposition(reactants) {
     );
     return {
       products: [oxide, "H2O"],
-      explanation: `Metal hydroxide (${c.formula}) decomposes into a metal oxide and water.`,
+      explanation: `El hidróxido metálico (${c.formula}) se descompone en un óxido metálico y agua.`,
     };
   }
 
@@ -680,7 +680,7 @@ function predictDecomposition(reactants) {
       const products = elements.map(elementFormula);
       return {
         products,
-        explanation: `Binary compound (${c.formula}) decomposes into its constituent elements.`,
+        explanation: `El compuesto binario (${c.formula}) se descompone en sus elementos.`,
       };
     }
   }
@@ -689,11 +689,11 @@ function predictDecomposition(reactants) {
   if (c.type === "metal_oxide") {
     return {
       products: [c.metal, "O2"],
-      explanation: `Metal oxide (${c.formula}) decomposes into the metal and oxygen gas.`,
+      explanation: `El óxido metálico (${c.formula}) se descompone en el metal y oxígeno gaseoso.`,
     };
   }
 
-  return { error: `Unsupported decomposition pattern for ${c.formula}. Cannot determine products.` };
+  return { error: `Patrón de descomposición no soportado para ${c.formula}. No se pueden determinar los productos.` };
 }
 
 /**
@@ -702,7 +702,7 @@ function predictDecomposition(reactants) {
  */
 function predictSingleDisplacement(reactants) {
   if (reactants.length !== 2) {
-    return { error: "Single displacement requires exactly two reactants: an element and a compound." };
+    return { error: "El desplazamiento simple requiere exactamente dos reactivos: un elemento y un compuesto." };
   }
 
   const classified = reactants.map(classifyCompound);
@@ -710,7 +710,7 @@ function predictSingleDisplacement(reactants) {
   const compound = classified.find(c => c.type !== "element");
 
   if (!element || !compound) {
-    return { error: "Single displacement requires one element and one compound." };
+    return { error: "El desplazamiento simple requiere un elemento y un compuesto." };
   }
 
   // === Metal displacing metal from ionic compound or acid ===
@@ -721,10 +721,10 @@ function predictSingleDisplacement(reactants) {
       const reactivity = isMoreReactive(metalSym, "H");
 
       if (reactivity === false) {
-        return { noReaction: true, explanation: `${metalSym} is less reactive than hydrogen in the activity series. No reaction occurs.` };
+        return { noReaction: true, explanation: `El ${metalSym} es menos reactivo que el hidrógeno en la serie de actividad. No hay reacción.` };
       }
       if (reactivity === null) {
-        return { error: `Cannot determine reactivity of ${metalSym} — not in the supported activity series.` };
+        return { error: `No se puede determinar la reactividad del ${metalSym}: no está en la serie de actividad soportada.` };
       }
 
       const charge = getMetalCharge(metalSym) || 2;
@@ -734,7 +734,7 @@ function predictSingleDisplacement(reactants) {
       );
       return {
         products: [salt, "H2"],
-        explanation: `${metalSym} is more reactive than hydrogen, so it displaces H₂ from the acid.`,
+        explanation: `El ${metalSym} es más reactivo que el hidrógeno, así que desplaza al H₂ del ácido.`,
       };
     }
 
@@ -742,17 +742,17 @@ function predictSingleDisplacement(reactants) {
     if (compound.type === "ionic" || compound.type === "carbonate" || compound.type === "hydroxide") {
       const compoundCation = compound.cation;
       if (!compoundCation) {
-        return { error: `Cannot identify the cation in ${compound.formula}.` };
+        return { error: `No se puede identificar el catión en ${compound.formula}.` };
       }
       const metalSym = element.symbol;
       const displacedMetal = compoundCation.symbol;
 
       const reactivity = isMoreReactive(metalSym, displacedMetal);
       if (reactivity === false) {
-        return { noReaction: true, explanation: `${metalSym} is less reactive than ${displacedMetal} in the activity series. No reaction occurs.` };
+        return { noReaction: true, explanation: `El ${metalSym} es menos reactivo que el ${displacedMetal} en la serie de actividad. No hay reacción.` };
       }
       if (reactivity === null) {
-        return { error: `Cannot determine reactivity between ${metalSym} and ${displacedMetal}.` };
+        return { error: `No se puede determinar la reactividad entre ${metalSym} y ${displacedMetal}.` };
       }
 
       // Prefer the replacing metal's natural charge for accurate valid cross (e.g., Al is always +3)
@@ -765,7 +765,7 @@ function predictSingleDisplacement(reactants) {
       const displacedSpecies = elementFormula(displacedMetal);
       return {
         products: [newCompound, displacedSpecies],
-        explanation: `${metalSym} is more reactive than ${displacedMetal}, so it displaces ${displacedMetal} from the compound.`,
+        explanation: `El ${metalSym} es más reactivo que el ${displacedMetal}, así que desplaza al ${displacedMetal} del compuesto.`,
       };
     }
   }
@@ -778,10 +778,10 @@ function predictSingleDisplacement(reactants) {
 
       const reactivity = isHalogenMoreReactive(incoming, existing);
       if (reactivity === false) {
-        return { noReaction: true, explanation: `${incoming} is less reactive than ${existing}. No displacement occurs.` };
+        return { noReaction: true, explanation: `El ${incoming} es menos reactivo que el ${existing}. No hay desplazamiento.` };
       }
       if (reactivity === null) {
-        return { error: `Cannot determine halogen reactivity between ${incoming} and ${existing}.` };
+        return { error: `No se puede determinar la reactividad de halógenos entre ${incoming} y ${existing}.` };
       }
 
       const newSalt = buildIonicFormula(
@@ -791,12 +791,12 @@ function predictSingleDisplacement(reactants) {
       const displacedHalogen = elementFormula(existing);
       return {
         products: [newSalt, displacedHalogen],
-        explanation: `${incoming} is more reactive than ${existing}, so it displaces ${existing} from the salt.`,
+        explanation: `El ${incoming} es más reactivo que el ${existing}, así que desplaza al ${existing} de la sal.`,
       };
     }
   }
 
-  return { error: "These reactants do not match a supported single displacement pattern." };
+  return { error: "Estos reactivos no corresponden a ningún patrón de desplazamiento simple soportado." };
 }
 
 /**
@@ -805,7 +805,7 @@ function predictSingleDisplacement(reactants) {
  */
 function predictDoubleDisplacement(reactants) {
   if (reactants.length !== 2) {
-    return { error: "Double displacement requires exactly two reactants." };
+    return { error: "El doble desplazamiento requiere exactamente dos reactivos." };
   }
 
   const classified = reactants.map(classifyCompound);
@@ -815,7 +815,7 @@ function predictDoubleDisplacement(reactants) {
   const c2 = classified[1];
 
   if (!c1.cation || !c1.anion || !c2.cation || !c2.anion) {
-    return { error: "Double displacement requires two ionic compounds or an acid and a base." };
+    return { error: "El doble desplazamiento requiere dos compuestos iónicos o un ácido y una base." };
   }
 
   // Swap partners: c1's cation + c2's anion, c2's cation + c1's anion
@@ -887,7 +887,7 @@ function predictDoubleDisplacement(reactants) {
   if (!hasDriver) {
     return {
       noReaction: true,
-      explanation: "No driving force: both products remain soluble, and no gas, water, or precipitate is formed.",
+      explanation: "No hay fuerza impulsora: ambos productos siguen solubles y no se forma gas, agua ni precipitado.",
     };
   }
 
@@ -903,7 +903,7 @@ function predictDoubleDisplacement(reactants) {
 
   return {
     products: dedupedProducts,
-    explanation: `The cations and anions swap partners in a double displacement reaction.`,
+    explanation: `En el doble desplazamiento, los cationes y aniones intercambian parejas.`,
   };
 }
 
@@ -918,7 +918,7 @@ function predictCombustion(reactants) {
   const fuel = classified.find(c => c.type !== "element" || c.symbol !== "O");
 
   if (!fuel) {
-    return { error: "Combustion requires a fuel compound." };
+    return { error: "La combustión requiere un compuesto combustible." };
   }
 
   // If O2 is not explicitly provided, auto-add it
@@ -929,12 +929,12 @@ function predictCombustion(reactants) {
 
   const fuelAtoms = fuel.atoms;
   if (!fuelAtoms) {
-    return { error: `Cannot parse the fuel formula "${fuel.formula}".` };
+    return { error: `No se puede interpretar la fórmula del combustible «${fuel.formula}».` };
   }
 
   // Must contain carbon and/or hydrogen to be a school-level combustion
   if (!fuelAtoms.C && !fuelAtoms.H) {
-    return { error: `These reactants do not match a supported combustion pattern. Combustion of hydrocarbons requires a compound containing carbon and/or hydrogen.` };
+    return { error: `Estos reactivos no corresponden a ningún patrón de combustión soportado. La combustión de hidrocarburos requiere un compuesto con carbono y/o hidrógeno.` };
   }
 
   const products = [];
@@ -944,7 +944,7 @@ function predictCombustion(reactants) {
   // If fuel has other elements (like S, N), we don't handle those in school scope
   const otherElements = Object.keys(fuelAtoms).filter(e => !["C", "H", "O"].includes(e));
   if (otherElements.length > 0) {
-    return { error: `Combustion of compounds containing ${otherElements.join(", ")} is not supported in school-level prediction.` };
+    return { error: `La combustión de compuestos con ${otherElements.join(", ")} no está soportada en la predicción de nivel escolar.` };
   }
 
   return {
@@ -976,12 +976,12 @@ const REACTION_HANDLERS = {
  */
 export function predictReaction(reactantInput, reactionType) {
   if (!reactantInput || !reactantInput.trim()) {
-    return { success: false, error: "Please enter reactant formulas." };
+    return { success: false, error: "Escribe las fórmulas de los reactivos." };
   }
 
   const handler = REACTION_HANDLERS[reactionType];
   if (!handler) {
-    return { success: false, error: `Unknown reaction type: "${reactionType}".` };
+    return { success: false, error: `Tipo de reacción desconocido: «${reactionType}».` };
   }
 
   // Parse reactant input: normalize first (Zero-to-O sanitizer, etc.) then split by +
@@ -993,7 +993,7 @@ export function predictReaction(reactantInput, reactionType) {
     .filter(Boolean);
 
   if (reactants.length === 0) {
-    return { success: false, error: "No valid reactant formulas found." };
+    return { success: false, error: "No se encontraron fórmulas de reactivos válidas." };
   }
 
   // Validate each reactant formula can be parsed
@@ -1001,7 +1001,7 @@ export function predictReaction(reactantInput, reactionType) {
     try {
       parseFormulaStrict(r);
     } catch (e) {
-      return { success: false, error: `Invalid formula "${r}": ${e.message}` };
+      return { success: false, error: `Fórmula no válida «${r}»: ${e.message}` };
     }
   }
 
@@ -1030,7 +1030,7 @@ export function predictReaction(reactantInput, reactionType) {
     } catch (e) {
       return {
         success: false,
-        error: `Internal prediction error: generated invalid product formula "${p}". ${e.message}`,
+        error: `Error interno de predicción: se generó una fórmula de producto no válida «${p}». ${e.message}`,
       };
     }
   }
@@ -1074,37 +1074,37 @@ export function getReactionTypes() {
   return [
     {
       id: "synthesis",
-      label: "Synthesis",
+      label: "Síntesis",
       icon: "⊕",
-      description: "Two or more substances combine to form one product.",
+      description: "Dos o más sustancias se combinan para formar un producto.",
       example: "Na + Cl₂ → NaCl",
     },
     {
       id: "decomposition",
-      label: "Decomposition",
+      label: "Descomposición",
       icon: "⊖",
-      description: "One compound breaks down into simpler substances.",
+      description: "Un compuesto se descompone en sustancias más simples.",
       example: "CaCO₃ → CaO + CO₂",
     },
     {
       id: "single_displacement",
-      label: "Single Displacement",
+      label: "Desplazamiento simple",
       icon: "⇄",
-      description: "An element replaces another in a compound.",
+      description: "Un elemento reemplaza a otro en un compuesto.",
       example: "Zn + HCl → ZnCl₂ + H₂",
     },
     {
       id: "double_displacement",
-      label: "Double Displacement",
+      label: "Doble desplazamiento",
       icon: "⇆",
-      description: "Two compounds exchange ions to form new products.",
+      description: "Dos compuestos intercambian iones para formar productos nuevos.",
       example: "AgNO₃ + NaCl → AgCl + NaNO₃",
     },
     {
       id: "combustion",
-      label: "Combustion",
+      label: "Combustión",
       icon: "🔥",
-      description: "A fuel reacts with oxygen to produce CO₂ and H₂O.",
+      description: "Un combustible reacciona con oxígeno para producir CO₂ y H₂O.",
       example: "CH₄ + O₂ → CO₂ + H₂O",
     },
   ];
