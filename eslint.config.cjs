@@ -7,9 +7,9 @@ module.exports = [
       "dist/**",
       "node_modules/**",
       ".continue/**",
-      "public/**",
-      "js/vendor/**",
-      "three.min.js",
+      // public/js holds our own classic scripts (copied as-is by Vite), so only vendor files are skipped.
+      "public/three.min.js",
+      "public/js/vendor/**",
       "generate_*.js",
       "patch_html.js",
     ],
